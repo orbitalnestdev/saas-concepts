@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Turnly — Appointment booking</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    :root {
+      --ink: #102524;
+      --muted: #607371;
+      --teal: #0ea5a4;
+      --teal-dark: #087f7e;
+      --mint: #dff6f3;
+      --line: #dbe8e6;
+      --paper: #ffffff;
+    }
+    * { box-sizing: border-box; }
+    html { background: #eaf5f3; }
+    body {
+      margin: 0;
+      min-width: 1200px;
+      color: var(--ink);
+      font-family: Inter, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      font-variant-numeric: tabular-nums;
+      background:
+        radial-gradient(circle at 8% 3%, rgba(14,165,164,.16), transparent 27%),
+        radial-gradient(circle at 90% 17%, rgba(120,215,196,.21), transparent 25%),
+        linear-gradient(180deg, #f7fcfb 0%, #edf8f6 50%, #f8fbfa 100%);
+    }
+    button, input { font: inherit; }
+    .page { width: 1440px; min-height: 2700px; margin: 0 auto; padding: 54px 64px 64px; overflow: hidden; }
+    .soft-shadow { box-shadow: 0 18px 50px rgba(33, 76, 72, .10), 0 2px 8px rgba(33, 76, 72, .05); }
+    .hairline { border: 1px solid var(--line); }
+    .icon { width: 20px; height: 20px; stroke-width: 1.8; }
+    .phone-grid { display: grid; grid-template-columns: repeat(4, 300px); gap: 28px; justify-content: center; }
+    .iphone {
+      width: 300px;
+      height: 680px;
+      padding: 9px;
+      border-radius: 47px;
+      background: linear-gradient(145deg, #344240, #0d1615 46%, #53615f);
+      box-shadow: 0 28px 48px rgba(20, 62, 58, .18), inset 0 0 0 1px rgba(255,255,255,.24);
+    }
+    .screen {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 39px;
+      overflow: hidden;
+      background: #fbfdfc;
+      border: 1px solid rgba(255,255,255,.2);
+    }
+    .island {
+      position: absolute;
+      z-index: 2;
+      top: 10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 86px;
+      height: 24px;
+      border-radius: 999px;
+      background: #091211;
+    }
+    .phone-content { height: 100%; padding: 46px 18px 18px; display: flex; flex-direction: column; }
+    .app-bottom { margin-top: auto; display: grid; grid-template-columns: repeat(4, 1fr); padding: 10px 3px 1px; border-top: 1px solid #e4eceb; }
+    .nav-dot { display: flex; flex-direction: column; align-items: center; gap: 3px; color: #9aacab; font-size: 8px; font-weight: 600; }
+    .nav-dot.active { color: var(--teal-dark); }
+    .nav-dot svg { width: 16px; height: 16px; }
+    .browser { border: 1px solid #cddfdd; border-radius: 16px; overflow: hidden; background: #fff; }
+    .browser-bar { height: 48px; display: flex; align-items: center; gap: 8px; padding: 0 17px; background: #f5f8f7; border-bottom: 1px solid #dbe6e4; }
+    .browser-dot { width: 10px; height: 10px; border-radius: 50%; background: #cfdbd9; }
+    .schedule { display: grid; grid-template-columns: 64px repeat(4, minmax(0, 1fr)); }
+    .schedule > div { min-height: 73px; border-right: 1px solid #e5edec; border-bottom: 1px solid #e5edec; }
+    .schedule > div:nth-child(5n) { border-right: 0; }
+    .slot { margin: 5px 7px; padding: 9px 10px; border-radius: 10px; background: #e7f7f4; border-left: 3px solid var(--teal); font-size: 11px; line-height: 1.35; }
+    .slot.dark { background: #dbf0ed; border-left-color: #167a76; }
+    .slot.gold { background: #fff3da; border-left-color: #d89625; }
+    .slot.rose { background: #fdeceb; border-left-color: #d66b65; }
+    .feature-card { background: rgba(255,255,255,.86); backdrop-filter: blur(8px); }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="flex items-center justify-between mb-14">
+      <div class="flex items-center gap-4">
+        <img src="logos/turnly.png" alt="Turnly app icon" class="w-[68px] h-[68px] rounded-2xl object-cover soft-shadow">
+        <div>
+          <div class="flex items-center gap-3">
+            <h1 class="text-[34px] leading-none font-extrabold tracking-[-0.04em]">Turnly</h1>
+            <span class="px-2.5 py-1 rounded-full bg-white hairline text-[11px] font-semibold text-[#0a817f]">v1.8</span>
+          </div>
+          <p class="mt-2 text-[15px] text-[#5d716f]">Booking app for clinics and salons · iOS · React Native + Expo</p>
+        </div>
+      </div>
+      <div class="flex gap-2.5">
+        <span class="px-4 py-2.5 rounded-full bg-white hairline text-[12px] font-semibold flex items-center gap-2">
+          <svg class="icon text-[#0ea5a4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z"/><path d="m9 12 2 2 4-4"/></svg>Real-time availability
+        </span>
+        <span class="px-4 py-2.5 rounded-full bg-white hairline text-[12px] font-semibold flex items-center gap-2">
+          <svg class="icon text-[#0ea5a4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h2"/></svg>Secure deposits
+        </span>
+        <span class="px-4 py-2.5 rounded-full bg-white hairline text-[12px] font-semibold flex items-center gap-2">
+          <svg class="icon text-[#0ea5a4]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 1-2.3-5.7L20 7"/><path d="M20 3v4h-4"/></svg>Easy rescheduling
+        </span>
+      </div>
+    </header>
+
+    <section aria-label="Turnly mobile app screens" class="mb-20">
+      <div class="phone-grid">
+        <article>
+          <div class="iphone"><div class="screen"><div class="island"></div><div class="phone-content">
+            <div class="flex items-center justify-between mb-5"><div><p class="text-[11px] text-[#738684]">Good morning</p><h2 class="text-[20px] font-bold tracking-[-.03em]">Hi, Olivia</h2></div><div class="w-9 h-9 rounded-full bg-[#dff6f3] flex items-center justify-center text-[11px] font-bold text-[#087f7e]">OM</div></div>
+            <div class="rounded-[18px] bg-[#0f7775] text-white p-4 shadow-lg shadow-teal-900/10">
+              <div class="flex items-center justify-between"><span class="text-[10px] font-semibold text-[#c7eeea]">NEXT APPOINTMENT</span><span class="text-[10px]">Tomorrow</span></div>
+              <p class="text-[18px] font-bold mt-3">Skin consultation</p><p class="text-[11px] text-[#c7eeea] mt-1">10:30 · Dr. Amelia Reed</p>
+              <div class="flex gap-2 mt-4"><button class="px-3 py-2 rounded-lg bg-white text-[#0f7775] text-[10px] font-bold">View details</button><button class="px-3 py-2 rounded-lg bg-white/10 text-[10px] font-semibold">Reschedule</button></div>
+            </div>
+            <div class="flex items-center justify-between mt-6 mb-3"><h3 class="text-[14px] font-bold">Book a service</h3><span class="text-[10px] font-semibold text-[#0b8e8d]">See all</span></div>
+            <div class="grid grid-cols-2 gap-2.5">
+              <div class="rounded-xl bg-white border border-[#dfebe9] p-3"><div class="w-8 h-8 rounded-lg bg-[#e4f6f3] flex items-center justify-center mb-2"><svg class="icon text-[#0a8785]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 2v3M16 2v3M3 9h18"/><rect x="3" y="4" width="18" height="17" rx="2"/></svg></div><p class="text-[11px] font-bold">Consultation</p><p class="text-[9px] text-[#758684] mt-1">45 min · from $65</p></div>
+              <div class="rounded-xl bg-white border border-[#dfebe9] p-3"><div class="w-8 h-8 rounded-lg bg-[#fff2dc] flex items-center justify-center mb-2"><svg class="icon text-[#d48819]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3v18M3 12h18"/><path d="m5.6 5.6 12.8 12.8m0-12.8L5.6 18.4"/></svg></div><p class="text-[11px] font-bold">Facial care</p><p class="text-[9px] text-[#758684] mt-1">60 min · from $90</p></div>
+              <div class="rounded-xl bg-white border border-[#dfebe9] p-3"><div class="w-8 h-8 rounded-lg bg-[#f0ebfb] flex items-center justify-center mb-2"><svg class="icon text-[#7c62b6]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 19c4-1 7-4 8-8 2 4 4 6 8 8"/><path d="M8 5c1.5 1 2.8 1.5 4 1.5S14.5 6 16 5"/></svg></div><p class="text-[11px] font-bold">Hair styling</p><p class="text-[9px] text-[#758684] mt-1">50 min · from $55</p></div>
+              <div class="rounded-xl bg-white border border-[#dfebe9] p-3"><div class="w-8 h-8 rounded-lg bg-[#fee9e7] flex items-center justify-center mb-2"><svg class="icon text-[#cf7068]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 3h12v18H6zM9 7h6M9 11h6M9 15h3"/></svg></div><p class="text-[11px] font-bold">Nail studio</p><p class="text-[9px] text-[#758684] mt-1">40 min · from $38</p></div>
+            </div>
+            <div class="app-bottom"><div class="nav-dot active"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v10H3z"/></svg>Home</div><div class="nav-dot"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18"/></svg>Bookings</div><div class="nav-dot"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>History</div><div class="nav-dot"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profile</div></div>
+          </div></div></div>
+          <p class="text-center mt-5 text-[12px] font-semibold text-[#55706d]">Discover and book</p>
+        </article>
+
+        <article>
+          <div class="iphone"><div class="screen"><div class="island"></div><div class="phone-content">
+            <div class="flex items-center gap-3 mb-5"><button class="w-8 h-8 rounded-full border border-[#dce9e7] flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><div><p class="text-[10px] text-[#718481]">Skin consultation</p><h2 class="text-[17px] font-bold">Choose a time</h2></div></div>
+            <p class="text-[10px] font-semibold text-[#657976] mb-2">PROFESSIONAL</p>
+            <div class="flex gap-2 mb-5"><div class="flex-1 p-2 rounded-xl border-2 border-[#0ea5a4] bg-[#edfaf8]"><div class="w-8 h-8 rounded-full bg-[#afdcd6] mb-2 flex items-center justify-center text-[9px] font-bold">AR</div><p class="text-[10px] font-bold">Dr. Reed</p><p class="text-[8px] text-[#657976]">4.9 · 6 yrs</p></div><div class="flex-1 p-2 rounded-xl border border-[#dce8e6]"><div class="w-8 h-8 rounded-full bg-[#e7ddd3] mb-2 flex items-center justify-center text-[9px] font-bold">ML</div><p class="text-[10px] font-bold">Maya Lee</p><p class="text-[8px] text-[#657976]">4.8 · 4 yrs</p></div><div class="flex-1 p-2 rounded-xl border border-[#dce8e6]"><div class="w-8 h-8 rounded-full bg-[#dfe3ee] mb-2 flex items-center justify-center text-[9px] font-bold">SK</div><p class="text-[10px] font-bold">Sam Kim</p><p class="text-[8px] text-[#657976]">4.9 · 8 yrs</p></div></div>
+            <div class="flex items-center justify-between mb-3"><button class="text-[#75908d]">‹</button><p class="text-[12px] font-bold">October 2026</p><button class="text-[#0c8886]">›</button></div>
+            <div class="grid grid-cols-7 gap-1 text-center mb-5">
+              <div class="text-[8px] text-[#849592]">MON<span class="block mt-2 text-[11px] font-semibold text-[#506461]">19</span></div><div class="text-[8px] text-[#849592]">TUE<span class="block mt-2 text-[11px] font-semibold text-[#506461]">20</span></div><div class="text-[8px] text-[#849592]">WED<span class="block mt-2 py-1.5 rounded-full bg-[#0ea5a4] text-[11px] font-bold text-white">21</span></div><div class="text-[8px] text-[#849592]">THU<span class="block mt-2 text-[11px] font-semibold text-[#506461]">22</span></div><div class="text-[8px] text-[#849592]">FRI<span class="block mt-2 text-[11px] font-semibold text-[#506461]">23</span></div><div class="text-[8px] text-[#849592]">SAT<span class="block mt-2 text-[11px] font-semibold text-[#506461]">24</span></div><div class="text-[8px] text-[#b1bcba]">SUN<span class="block mt-2 text-[11px]">25</span></div>
+            </div>
+            <p class="text-[12px] font-bold mb-3">Available slots</p>
+            <div class="grid grid-cols-3 gap-2 text-[10px] font-semibold text-center"><span class="py-2 rounded-lg border border-[#dce8e6]">09:00</span><span class="py-2 rounded-lg border border-[#dce8e6]">10:30</span><span class="py-2 rounded-lg bg-[#0ea5a4] text-white">11:15</span><span class="py-2 rounded-lg border border-[#dce8e6]">13:00</span><span class="py-2 rounded-lg border border-[#dce8e6]">14:30</span><span class="py-2 rounded-lg border border-[#dce8e6]">16:45</span></div>
+            <div class="mt-auto"><div class="flex justify-between text-[10px] mb-3"><span class="text-[#728582]">Wed, Oct 21 · 11:15</span><span class="font-bold">$65</span></div><button class="w-full bg-[#0b8785] text-white py-3.5 rounded-xl text-[11px] font-bold">Continue to payment</button></div>
+          </div></div></div>
+          <p class="text-center mt-5 text-[12px] font-semibold text-[#55706d]">Pick a professional and time</p>
+        </article>
+
+        <article>
+          <div class="iphone"><div class="screen"><div class="island"></div><div class="phone-content">
+            <div class="flex items-center gap-3 mb-6"><button class="w-8 h-8 rounded-full border border-[#dce9e7] flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button><h2 class="text-[17px] font-bold">Review and pay</h2></div>
+            <div class="rounded-2xl border border-[#dce8e6] bg-white p-4 mb-4"><div class="flex gap-3"><div class="w-11 h-11 rounded-xl bg-[#dff6f3] flex items-center justify-center"><svg class="icon text-[#0b8886]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18"/></svg></div><div><p class="text-[12px] font-bold">Skin consultation</p><p class="text-[9px] text-[#718481] mt-1">Wed, Oct 21 · 11:15</p><p class="text-[9px] text-[#718481]">Dr. Amelia Reed · 45 min</p></div></div></div>
+            <p class="text-[11px] font-bold mb-3">Payment method</p>
+            <div class="rounded-xl border-2 border-[#0ea5a4] bg-[#effaf8] p-3 flex items-center justify-between"><div class="flex items-center gap-3"><div class="w-10 h-7 rounded-md bg-[#172b2a] text-white text-[8px] font-bold flex items-center justify-center">VISA</div><div><p class="text-[10px] font-bold">•••• 4281</p><p class="text-[8px] text-[#728582]">Expires 08/29</p></div></div><span class="w-4 h-4 rounded-full bg-[#0ea5a4] border-4 border-white outline outline-1 outline-[#0ea5a4]"></span></div>
+            <button class="mt-2 rounded-xl border border-[#dce8e6] p-3 text-[10px] font-semibold text-left">+ Add payment method</button>
+            <div class="mt-6 space-y-3 text-[10px]"><div class="flex justify-between"><span class="text-[#718481]">Service</span><span>$65.00</span></div><div class="flex justify-between"><span class="text-[#718481]">Booking deposit</span><span class="font-semibold">$20.00</span></div><div class="flex justify-between border-t border-[#e1eae9] pt-3 text-[12px] font-bold"><span>Pay now</span><span>$20.00</span></div><p class="text-[8px] text-[#879795] leading-relaxed">The remaining $45.00 is due at your appointment. Free cancellation up to 24 hours before.</p></div>
+            <div class="mt-auto"><button class="w-full bg-[#0b8785] text-white py-3.5 rounded-xl text-[11px] font-bold flex items-center justify-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Pay $20.00</button><p class="text-center text-[8px] text-[#7d908d] mt-3">Encrypted and securely processed</p></div>
+          </div></div></div>
+          <p class="text-center mt-5 text-[12px] font-semibold text-[#55706d]">Deposit and confirmation</p>
+        </article>
+
+        <article>
+          <div class="iphone"><div class="screen"><div class="island"></div><div class="phone-content">
+            <div class="flex items-center justify-between mb-5"><h2 class="text-[20px] font-bold tracking-[-.03em]">My bookings</h2><button class="w-8 h-8 rounded-full border border-[#dce9e7] flex items-center justify-center"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button></div>
+            <div class="grid grid-cols-2 p-1 rounded-xl bg-[#edf3f2] text-[10px] font-semibold text-center mb-5"><span class="py-2 rounded-lg bg-white shadow-sm">Upcoming · 2</span><span class="py-2 text-[#718481]">Past</span></div>
+            <div class="rounded-2xl border border-[#cfe6e2] bg-white overflow-hidden mb-3"><div class="h-1.5 bg-[#0ea5a4]"></div><div class="p-4"><div class="flex items-start justify-between"><div><p class="text-[9px] font-semibold text-[#0b8e8d]">TOMORROW · 10:30</p><h3 class="text-[13px] font-bold mt-1">Skin consultation</h3><p class="text-[9px] text-[#718481] mt-1">Dr. Amelia Reed · North clinic</p></div><div class="w-8 h-8 rounded-full bg-[#d9efec] flex items-center justify-center text-[8px] font-bold">AR</div></div><div class="mt-4 px-3 py-2.5 rounded-lg bg-[#f1f8f7] flex items-center gap-2"><svg class="w-4 h-4 text-[#0a8583]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><p class="text-[8px] text-[#526b68]">Reminder set for today at 10:30</p></div><div class="flex gap-2 mt-3"><button class="flex-1 py-2.5 rounded-lg bg-[#0b8785] text-white text-[9px] font-bold">View details</button><button class="flex-1 py-2.5 rounded-lg border border-[#d9e6e4] text-[9px] font-semibold">Reschedule</button></div></div></div>
+            <div class="rounded-2xl border border-[#dce8e6] bg-white p-4"><div class="flex items-start justify-between"><div><p class="text-[9px] font-semibold text-[#718481]">FRI, OCT 30 · 15:00</p><h3 class="text-[13px] font-bold mt-1">Deep tissue massage</h3><p class="text-[9px] text-[#718481] mt-1">Noah Bennett · Wellness room 2</p></div><div class="w-8 h-8 rounded-full bg-[#ebe2d9] flex items-center justify-center text-[8px] font-bold">NB</div></div><div class="mt-4 flex items-center justify-between text-[9px]"><span class="text-[#718481]">Deposit paid</span><span class="font-bold text-[#0c8583]">$25.00</span></div></div>
+            <div class="mt-auto px-3 py-3 rounded-xl bg-[#fff6e4] border border-[#f5dfb3] flex gap-2"><svg class="w-4 h-4 text-[#ba7619] shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg><p class="text-[8px] leading-relaxed text-[#76511f]">WhatsApp reminders are active for both bookings.</p></div>
+            <div class="app-bottom"><div class="nav-dot"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m3 11 9-8 9 8v10H3z"/></svg>Home</div><div class="nav-dot active"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4m8-4v4M3 10h18"/></svg>Bookings</div><div class="nav-dot"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>History</div><div class="nav-dot"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Profile</div></div>
+          </div></div></div>
+          <p class="text-center mt-5 text-[12px] font-semibold text-[#55706d]">Manage every booking</p>
+        </article>
+      </div>
+    </section>
+
+    <section aria-labelledby="backoffice-title" class="mb-16">
+      <div class="flex items-end justify-between mb-6">
+        <div><p class="text-[13px] font-semibold text-[#0b8886]">One system, two experiences</p><h2 id="backoffice-title" class="text-[31px] font-bold tracking-[-.04em] mt-2">The day, organized at a glance</h2></div>
+        <p class="max-w-[410px] text-[14px] leading-6 text-[#637572]">Teams see live capacity, schedules and revenue while clients book from their phones.</p>
+      </div>
+      <div class="browser soft-shadow">
+        <div class="browser-bar"><span class="browser-dot"></span><span class="browser-dot"></span><span class="browser-dot"></span><div class="ml-4 h-7 w-[390px] rounded-lg bg-white border border-[#dbe6e4] flex items-center px-3 text-[10px] text-[#8a9997]">Turnly business workspace</div><div class="ml-auto flex items-center gap-2 text-[10px] font-semibold text-[#526865]"><span class="w-7 h-7 rounded-full bg-[#dcefeb] flex items-center justify-center">BC</span>Brook &amp; Clay Studio</div></div>
+        <div class="grid grid-cols-[195px_1fr] min-h-[930px]">
+          <aside class="bg-[#f8fbfa] border-r border-[#e0eae8] p-5">
+            <div class="flex items-center gap-2.5 mb-8"><img src="logos/turnly.png" alt="" class="w-8 h-8 rounded-lg"><span class="font-bold text-[15px]">Turnly</span></div>
+            <nav class="space-y-1 text-[12px] font-medium"><div class="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-[#ddf4f1] text-[#087f7e]"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4m8-4v4M3 10h18"/></svg>Calendar</div><div class="flex items-center gap-3 px-3 py-2.5 text-[#657774]"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/></svg>Clients</div><div class="flex items-center gap-3 px-3 py-2.5 text-[#657774]"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>Team</div><div class="flex items-center gap-3 px-3 py-2.5 text-[#657774]"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19V2"/></svg>Reports</div><div class="flex items-center gap-3 px-3 py-2.5 text-[#657774]"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.8 1.8 0 0 0 .36 2l.06.06-2.12 2.12-.06-.06a1.8 1.8 0 0 0-2-.36 1.8 1.8 0 0 0-1.1 1.65V21h-3v-.09a1.8 1.8 0 0 0-1.1-1.65 1.8 1.8 0 0 0-2 .36l-.06.06-2.12-2.12.06-.06a1.8 1.8 0 0 0 .36-2A1.8 1.8 0 0 0 5 14.4H5v-3h.09a1.8 1.8 0 0 0 1.65-1.1 1.8 1.8 0 0 0-.36-2l-.06-.06 2.12-2.12.06.06a1.8 1.8 0 0 0 2 .36A1.8 1.8 0 0 0 11.6 5V5h3v.09a1.8 1.8 0 0 0 1.1 1.65 1.8 1.8 0 0 0 2-.36l.06-.06 2.12 2.12-.06.06a1.8 1.8 0 0 0-.36 2 1.8 1.8 0 0 0 1.65 1.1h.09v3h-.09A1.8 1.8 0 0 0 19.4 15Z"/></svg>Settings</div></nav>
+            <div class="mt-[530px] rounded-xl border border-[#d9e8e5] bg-white p-3"><p class="text-[10px] font-semibold">October capacity</p><div class="h-1.5 bg-[#e5efed] rounded-full mt-3 overflow-hidden"><div class="w-[78%] h-full bg-[#0ea5a4] rounded-full"></div></div><p class="text-[9px] text-[#728582] mt-2">78% booked · 124 slots left</p></div>
+          </aside>
+          <div class="p-7">
+            <div class="flex items-center justify-between"><div><p class="text-[11px] text-[#788a87]">Wednesday, October 21</p><h3 class="text-[23px] font-bold tracking-[-.03em] mt-1">Today’s schedule</h3></div><div class="flex gap-2"><button class="px-3.5 py-2.5 border border-[#d6e4e2] rounded-lg text-[10px] font-semibold">Day view</button><button class="px-3.5 py-2.5 bg-[#0b8785] text-white rounded-lg text-[10px] font-semibold flex items-center gap-2">+ New appointment</button></div></div>
+            <div class="grid grid-cols-4 gap-3 my-6"><div class="p-4 rounded-xl border border-[#dae7e5]"><p class="text-[10px] text-[#748683]">Occupancy</p><p class="text-[21px] font-bold mt-2">84%</p><p class="text-[9px] text-[#0a8986] mt-1">+7% vs last Wed</p></div><div class="p-4 rounded-xl border border-[#dae7e5]"><p class="text-[10px] text-[#748683]">Appointments</p><p class="text-[21px] font-bold mt-2">31</p><p class="text-[9px] text-[#748683] mt-1">4 remaining slots</p></div><div class="p-4 rounded-xl border border-[#dae7e5]"><p class="text-[10px] text-[#748683]">Cancellations</p><p class="text-[21px] font-bold mt-2">2</p><p class="text-[9px] text-[#c06a55] mt-1">6.1% cancellation rate</p></div><div class="p-4 rounded-xl border border-[#dae7e5]"><p class="text-[10px] text-[#748683]">Revenue today</p><p class="text-[21px] font-bold mt-2">$2,460</p><p class="text-[9px] text-[#0a8986] mt-1">$580 in deposits</p></div></div>
+            <div class="schedule rounded-xl border border-[#dfe9e7] overflow-hidden">
+              <div class="bg-[#f7faf9]"></div><div class="bg-[#f7faf9] px-3 py-3"><p class="text-[11px] font-bold">Amelia Reed</p><p class="text-[9px] text-[#758683]">Dermatology · 88%</p></div><div class="bg-[#f7faf9] px-3 py-3"><p class="text-[11px] font-bold">Maya Lee</p><p class="text-[9px] text-[#758683]">Aesthetics · 75%</p></div><div class="bg-[#f7faf9] px-3 py-3"><p class="text-[11px] font-bold">Noah Bennett</p><p class="text-[9px] text-[#758683]">Massage · 92%</p></div><div class="bg-[#f7faf9] px-3 py-3"><p class="text-[11px] font-bold">Sofia Kim</p><p class="text-[9px] text-[#758683]">Hair · 79%</p></div>
+              <div class="px-3 py-2 text-[9px] text-[#82918f]">09:00</div><div><div class="slot"><b>Emma Wilson</b><br>Follow-up · 45 min</div></div><div><div class="slot gold"><b>Leo Carter</b><br>Facial care · 60 min</div></div><div></div><div><div class="slot dark"><b>Ava Brooks</b><br>Cut &amp; style · 50 min</div></div>
+              <div class="px-3 py-2 text-[9px] text-[#82918f]">10:00</div><div><div class="slot dark"><b>Olivia Martin</b><br>Consultation · 45 min</div></div><div><div class="slot"><b>Mia Foster</b><br>Hydration facial · 60 min</div></div><div><div class="slot gold"><b>Henry Scott</b><br>Deep tissue · 60 min</div></div><div><div class="slot"><b>Chloe Davis</b><br>Color service · 90 min</div></div>
+              <div class="px-3 py-2 text-[9px] text-[#82918f]">11:00</div><div><div class="slot"><b>Ethan Cole</b><br>Skin review · 45 min</div></div><div></div><div><div class="slot dark"><b>Grace Hall</b><br>Sports massage · 45 min</div></div><div><div class="slot"><b>Ruby Evans</b><br>Cut &amp; blow-dry · 60 min</div></div>
+              <div class="px-3 py-2 text-[9px] text-[#82918f]">12:00</div><div></div><div><div class="slot rose"><b>Cancelled</b><br>Nina Clarke · 12:15</div></div><div><div class="slot gold"><b>James Wood</b><br>Recovery session · 60 min</div></div><div></div>
+              <div class="px-3 py-2 text-[9px] text-[#82918f]">13:00</div><div><div class="slot dark"><b>Daniel Green</b><br>Consultation · 45 min</div></div><div><div class="slot"><b>Lily Parker</b><br>Facial care · 60 min</div></div><div></div><div><div class="slot gold"><b>Zoe Price</b><br>Gloss treatment · 75 min</div></div>
+              <div class="px-3 py-2 text-[9px] text-[#82918f]">14:00</div><div><div class="slot"><b>Isla Moore</b><br>Follow-up · 30 min</div></div><div><div class="slot dark"><b>Finn Lewis</b><br>Peel treatment · 45 min</div></div><div><div class="slot"><b>Alex Stone</b><br>Deep tissue · 60 min</div></div><div><div class="slot dark"><b>Lucy King</b><br>Style consult · 45 min</div></div>
+              <div class="px-3 py-2 text-[9px] text-[#82918f]">15:00</div><div></div><div><div class="slot"><b>Ella Baker</b><br>Facial care · 60 min</div></div><div><div class="slot gold"><b>Max Turner</b><br>Mobility massage · 45 min</div></div><div><div class="slot"><b>Sarah Bell</b><br>Cut &amp; style · 60 min</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section aria-labelledby="features-title">
+      <div class="text-center mb-8"><h2 id="features-title" class="text-[31px] font-bold tracking-[-.04em]">Less admin between every appointment</h2><p class="text-[14px] text-[#637572] mt-3">The details that keep calendars full and clients informed.</p></div>
+      <div class="grid grid-cols-3 gap-5">
+        <article class="feature-card hairline rounded-2xl p-7 soft-shadow"><div class="w-12 h-12 rounded-xl bg-[#def5ec] flex items-center justify-center mb-6"><svg class="w-6 h-6 text-[#12825f]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M21 11.5a8.4 8.4 0 0 1-9 8.4 9.7 9.7 0 0 1-4.1-.9L3 20l1.3-4A8.4 8.4 0 1 1 21 11.5Z"/><path d="M8 10.5c1 2 2.5 3.5 4.5 4.5"/></svg></div><h3 class="text-[18px] font-bold tracking-[-.02em]">WhatsApp reminders</h3><p class="text-[13px] leading-6 text-[#667875] mt-3">Automatic confirmations and reminders 24 hours before each visit reduce no-shows without adding work for the team.</p><div class="mt-6 pt-5 border-t border-[#e0e9e7] flex items-center justify-between"><span class="text-[11px] font-semibold text-[#607572]">92% delivery rate</span><span class="px-2.5 py-1 rounded-full bg-[#e7f6ef] text-[#167252] text-[10px] font-bold">Active</span></div></article>
+        <article class="feature-card hairline rounded-2xl p-7 soft-shadow"><div class="w-12 h-12 rounded-xl bg-[#e1f3f5] flex items-center justify-center mb-6"><svg class="w-6 h-6 text-[#0e7b83]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18M7 15h2"/></svg></div><h3 class="text-[18px] font-bold tracking-[-.02em]">Deposits at checkout</h3><p class="text-[13px] leading-6 text-[#667875] mt-3">Set a flat or percentage deposit by service. Clients pay securely while booking and see the remaining balance clearly.</p><div class="mt-6 pt-5 border-t border-[#e0e9e7] flex items-center justify-between"><span class="text-[11px] font-semibold text-[#607572]">$8,420 protected</span><span class="px-2.5 py-1 rounded-full bg-[#e6f4f5] text-[#0e737b] text-[10px] font-bold">This month</span></div></article>
+        <article class="feature-card hairline rounded-2xl p-7 soft-shadow"><div class="w-12 h-12 rounded-xl bg-[#f5ecdc] flex items-center justify-center mb-6"><svg class="w-6 h-6 text-[#a96e16]" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M20 11a8 8 0 1 1-2.3-5.7L20 7"/><path d="M20 3v4h-4"/><path d="M12 8v4l3 2"/></svg></div><h3 class="text-[18px] font-bold tracking-[-.02em]">Reschedule in one tap</h3><p class="text-[13px] leading-6 text-[#667875] mt-3">Clients can move an eligible appointment into a live slot. The old time is released immediately for someone else.</p><div class="mt-6 pt-5 border-t border-[#e0e9e7] flex items-center justify-between"><span class="text-[11px] font-semibold text-[#607572]">64 calls avoided</span><span class="px-2.5 py-1 rounded-full bg-[#f7efe2] text-[#94641d] text-[10px] font-bold">Last 30 days</span></div></article>
+      </div>
+    </section>
+  </main>
+  <script>
+    Chart.defaults.animation = false;
+  </script>
+</body>
+</html>

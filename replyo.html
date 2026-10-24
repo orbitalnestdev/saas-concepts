@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Replyo — AI WhatsApp Inbox</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <script>
+    tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter','sans-serif'] }, colors: { ink:'#101513', leaf:'#16A34A' } } } }
+  </script>
+  <style>
+    *{box-sizing:border-box} html{background:#edf1ee} body{margin:0;color:#101513;font-family:Inter,sans-serif;font-feature-settings:"tnum" 1,"cv11" 1}
+    button,input{font:inherit} svg{display:block} .icon{width:18px;height:18px;stroke-width:1.8}
+    .shell{width:1440px;min-height:2910px;margin:0 auto;background:#f8faf8;border-left:1px solid #dde4df;border-right:1px solid #dde4df}
+    .topbar{height:84px;padding:0 34px;display:flex;align-items:center;justify-content:space-between;background:#fff;border-bottom:1px solid #e2e8e3}
+    .brandmark{width:38px;height:38px;border-radius:11px;object-fit:cover}.brandname{font-size:19px;font-weight:700;letter-spacing:-.03em}
+    .search{width:360px;height:42px;border:1px solid #dce3de;border-radius:12px;background:#f7f9f7;padding:0 14px;display:flex;align-items:center;gap:10px;color:#748079;font-size:13px}
+    .avatar{display:grid;place-items:center;border-radius:50%;font-weight:650;letter-spacing:-.02em;flex:0 0 auto}
+    .workspace{padding:24px 30px 0}.muted{color:#6f7973}.hairline{border-color:#e1e7e2}.panel{background:#fff;border:1px solid #e0e6e1;border-radius:15px;box-shadow:0 1px 2px rgba(16,21,19,.035)}
+    .inbox-grid{height:1050px;display:grid;grid-template-columns:330px minmax(0,1fr) 292px;overflow:hidden}
+    .conversations{border-right:1px solid #e2e7e3}.customer{border-left:1px solid #e2e7e3}.section-head{height:72px;padding:0 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e4e9e5}
+    .conv{height:104px;padding:16px 18px;display:grid;grid-template-columns:42px 1fr auto;gap:11px;border-bottom:1px solid #edf0ed}.conv.active{background:#edf9f0;box-shadow:inset 3px 0 #16A34A}
+    .badge{display:inline-flex;align-items:center;gap:5px;height:23px;padding:0 8px;border-radius:999px;font-size:11px;font-weight:600;white-space:nowrap}.green{background:#e8f7ec;color:#137437}.amber{background:#fff5d9;color:#976406}.blue{background:#eaf2ff;color:#2b63b5}.gray{background:#f0f3f1;color:#5b6760}.violet{background:#f1ecff;color:#6941c6}
+    .chat-head{height:72px;padding:0 22px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #e4e9e5}.chat-body{height:818px;padding:26px 32px;background:#f5f7f5;background-image:radial-gradient(#dfe5e0 .65px,transparent .65px);background-size:14px 14px}
+    .day{text-align:center;font-size:11px;color:#7d8881;margin:2px 0 22px}.message{max-width:72%;padding:12px 14px;border:1px solid #e0e5e1;border-radius:14px 14px 14px 4px;background:#fff;font-size:13px;line-height:1.55;margin:0 0 12px}.message.out{margin-left:auto;background:#dcf8e5;border-color:#c6ebd2;border-radius:14px 14px 4px 14px}.msg-meta{font-size:10px;color:#758078;margin-top:6px;text-align:right}.system-note{width:82%;margin:18px auto;padding:11px 13px;border:1px solid #f0dda8;border-radius:10px;background:#fff9e8;color:#725a18;font-size:11px;line-height:1.45}
+    .composer{height:160px;padding:18px 22px;border-top:1px solid #e4e9e5;background:#fff}.replybox{height:84px;border:1px solid #dce3de;border-radius:13px;padding:14px;color:#8a948e;font-size:13px}.composer-row{display:flex;align-items:center;justify-content:space-between;margin-top:10px}
+    .btn{height:38px;border:0;border-radius:10px;padding:0 15px;display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:650}.btn-dark{background:#111513;color:#fff}.btn-green{background:#16A34A;color:#fff}.btn-soft{background:#f1f4f2;color:#38413c;border:1px solid #e0e5e1}
+    .customer-inner{padding:20px}.data-row{display:flex;justify-content:space-between;gap:15px;padding:11px 0;border-bottom:1px solid #edf0ee;font-size:12px}.data-row:last-child{border:0}.order{padding:12px;border:1px solid #e1e7e2;border-radius:11px;margin-top:10px;background:#fbfcfb}
+    .heading-row{display:flex;align-items:end;justify-content:space-between;margin:44px 2px 18px}.heading-row h2{font-size:22px;line-height:1.2;letter-spacing:-.035em;font-weight:700}.heading-row p{font-size:12px;color:#758078;margin-top:7px}
+    .builder{height:770px;padding:22px;position:relative;overflow:hidden;background-color:#f9fbf9;background-image:linear-gradient(#e9edea 1px,transparent 1px),linear-gradient(90deg,#e9edea 1px,transparent 1px);background-size:24px 24px}
+    .builder-bar{height:60px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;background:#fff;border:1px solid #e0e6e1;border-radius:12px;position:relative;z-index:3}
+    .flow{position:relative;height:640px}.node{position:absolute;width:218px;background:#fff;border:1px solid #dce3de;border-radius:13px;box-shadow:0 7px 20px rgba(31,43,35,.07);z-index:2;overflow:hidden}.node-top{height:9px}.node-body{padding:15px}.node-icon{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;margin-bottom:12px}.node h3{font-size:13px;font-weight:700}.node p{font-size:11px;line-height:1.45;color:#78837c;margin-top:5px}.node-foot{padding:10px 14px;border-top:1px solid #edf0ee;font-size:10px;color:#77827b;display:flex;justify-content:space-between}.n1{left:34px;top:234px}.n2{left:350px;top:234px}.n3{left:682px;top:36px}.n4{left:682px;top:236px}.n5{left:682px;top:436px}.n6{left:1022px;top:236px}.wire{position:absolute;border-color:#9eaaa2;z-index:1}.w1{left:252px;top:298px;width:98px;border-top:2px solid #9eaaa2}.w2{left:568px;top:98px;width:114px;height:200px;border-top:2px solid #9eaaa2;border-right:2px solid #9eaaa2}.w3{left:568px;top:298px;width:114px;border-top:2px solid #9eaaa2}.w4{left:568px;top:298px;width:114px;height:200px;border-bottom:2px solid #9eaaa2;border-right:2px solid #9eaaa2}.w5{left:900px;top:298px;width:122px;border-top:2px solid #9eaaa2}.dot{position:absolute;width:8px;height:8px;border-radius:50%;background:#fff;border:2px solid #758079;z-index:3}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}.kpi{padding:20px 21px;height:132px}.kpi-label{display:flex;align-items:center;justify-content:space-between;color:#68736c;font-size:12px}.kpi-value{font-size:30px;letter-spacing:-.05em;font-weight:700;margin-top:17px}.trend{font-size:11px;color:#16843e;font-weight:600;margin-left:8px}
+    .analytics{display:grid;grid-template-columns:1.55fr .85fr;gap:16px;margin-bottom:40px}.chart-card{height:465px;padding:22px}.intent-card{height:465px;overflow:hidden}.intent-row{display:grid;grid-template-columns:1fr 74px 74px;align-items:center;padding:17px 20px;border-top:1px solid #edf0ee;font-size:12px}.intent-bar{height:6px;border-radius:8px;background:#edf1ee;overflow:hidden;margin-top:8px}.intent-bar span{display:block;height:100%;background:#1aa34b;border-radius:8px}.legend{display:flex;gap:18px;font-size:11px;color:#707a74}.legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}.footer{height:92px;border-top:1px solid #e0e6e1;background:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 34px;color:#77827b;font-size:11px}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="flex items-center gap-3"><img class="brandmark" src="logos/replyo.png" alt="Replyo logo"><div><div class="brandname">replyo</div><div class="text-[10px] text-slate-500 mt-0.5">AI agent workspace</div></div></div>
+      <div class="search"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Search conversations, customers or orders</span><span class="ml-auto text-[10px] border border-slate-200 rounded px-1.5 py-0.5 bg-white">⌘ K</span></div>
+      <div class="flex items-center gap-3"><button class="btn btn-soft"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg></button><div class="text-right"><div class="text-xs font-semibold">Maya Patel</div><div class="text-[10px] muted mt-0.5">Support lead</div></div><div class="avatar w-9 h-9 bg-[#17231c] text-white text-xs">MP</div></div>
+    </header>
+
+    <div class="workspace">
+      <div class="flex items-end justify-between mb-5">
+        <div><div class="flex items-center gap-2 text-[11px] muted mb-2"><span>Inbox</span><span>/</span><span class="text-ink">All conversations</span></div><h1 class="text-[27px] leading-none font-bold tracking-[-0.045em]">Good morning, Maya</h1><p class="text-xs muted mt-2">Your AI agent handled 84 conversations while you were away.</p></div>
+        <div class="flex gap-2"><button class="btn btn-soft"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M4 4v6h6M20 20v-6h-6"/><path d="M5.1 15a8 8 0 0 0 13.2 2M18.9 9A8 8 0 0 0 5.7 7"/></svg>Sync inbox</button><button class="btn btn-dark"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>New conversation</button></div>
+      </div>
+
+      <section class="panel inbox-grid" aria-label="WhatsApp inbox">
+        <aside class="conversations">
+          <div class="section-head"><div><div class="text-sm font-bold">Conversations</div><div class="text-[10px] muted mt-1">18 open · 6 need attention</div></div><button aria-label="Filter conversations"><svg class="icon" fill="none" stroke="#4d5851" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M10 18h4"/></svg></button></div>
+          <div class="h-12 px-4 flex items-center gap-2 border-b hairline text-[11px]"><span class="badge green">All 24</span><span class="badge gray">Mine 6</span><span class="badge gray">Unread 9</span></div>
+          <div class="conv active"><div class="avatar w-[42px] h-[42px] bg-[#dff3e5] text-[#16703a] text-xs">LB</div><div class="min-w-0"><div class="flex items-center gap-1.5"><span class="text-xs font-semibold truncate">Lucia Bennett</span><span class="badge green !h-[18px] !px-1.5 !text-[9px]">Sales</span></div><p class="text-[11px] text-slate-600 truncate mt-1.5">Perfect, can I get it by Friday?</p><span class="text-[9px] text-[#168442] font-medium">AI handling</span></div><div class="text-[9px] muted">10:42</div></div>
+          <div class="conv"><div class="avatar w-[42px] h-[42px] bg-[#e7efff] text-[#315fa4] text-xs">OR</div><div class="min-w-0"><div class="flex gap-1.5"><span class="text-xs font-semibold truncate">Owen Rivera</span><span class="badge blue !h-[18px] !px-1.5 !text-[9px]">Support</span></div><p class="text-[11px] text-slate-600 truncate mt-1.5">My tracking code isn't updating</p><span class="text-[9px] muted">WhatsApp</span></div><div class="text-[9px] muted">10:31</div></div>
+          <div class="conv"><div class="avatar w-[42px] h-[42px] bg-[#fae9df] text-[#9a552c] text-xs">SN</div><div class="min-w-0"><div class="flex gap-1.5"><span class="text-xs font-semibold truncate">Sofia Novak</span><span class="badge amber !h-[18px] !px-1.5 !text-[9px]">Sales</span></div><p class="text-[11px] text-slate-600 truncate mt-1.5">Do you offer volume pricing?</p><span class="text-[9px] text-[#168442] font-medium">AI handling</span></div><div class="text-[9px] muted">10:18</div></div>
+          <div class="conv"><div class="avatar w-[42px] h-[42px] bg-[#ece7f7] text-[#674799] text-xs">EM</div><div class="min-w-0"><div class="flex gap-1.5"><span class="text-xs font-semibold truncate">Elias Morgan</span><span class="badge blue !h-[18px] !px-1.5 !text-[9px]">Support</span></div><p class="text-[11px] text-slate-600 truncate mt-1.5">Thanks, that solved it.</p><span class="text-[9px] muted">WhatsApp</span></div><div class="text-[9px] muted">09:57</div></div>
+          <div class="conv"><div class="avatar w-[42px] h-[42px] bg-[#f2eedc] text-[#7b6822] text-xs">NH</div><div class="min-w-0"><div class="flex gap-1.5"><span class="text-xs font-semibold truncate">Nora Hughes</span><span class="badge green !h-[18px] !px-1.5 !text-[9px]">Sales</span></div><p class="text-[11px] text-slate-600 truncate mt-1.5">I'd like to change my order</p><span class="text-[9px] text-[#168442] font-medium">AI handling</span></div><div class="text-[9px] muted">09:41</div></div>
+          <div class="conv"><div class="avatar w-[42px] h-[42px] bg-[#e4f2ef] text-[#22796d] text-xs">YK</div><div class="min-w-0"><div class="flex gap-1.5"><span class="text-xs font-semibold truncate">Yuki Kimura</span><span class="badge blue !h-[18px] !px-1.5 !text-[9px]">Support</span></div><p class="text-[11px] text-slate-600 truncate mt-1.5">Can you resend the invoice?</p><span class="text-[9px] muted">WhatsApp</span></div><div class="text-[9px] muted">09:26</div></div>
+          <div class="conv"><div class="avatar w-[42px] h-[42px] bg-[#f4e5e8] text-[#98485a] text-xs">AK</div><div class="min-w-0"><div class="flex gap-1.5"><span class="text-xs font-semibold truncate">Amara Khan</span><span class="badge green !h-[18px] !px-1.5 !text-[9px]">Sales</span></div><p class="text-[11px] text-slate-600 truncate mt-1.5">What colors are still available?</p><span class="text-[9px] text-[#168442] font-medium">AI handling</span></div><div class="text-[9px] muted">09:08</div></div>
+          <div class="conv"><div class="avatar w-[42px] h-[42px] bg-[#e8ecef] text-[#4f6170] text-xs">TH</div><div class="min-w-0"><div class="flex gap-1.5"><span class="text-xs font-semibold truncate">Theo Hall</span><span class="badge blue !h-[18px] !px-1.5 !text-[9px]">Support</span></div><p class="text-[11px] text-slate-600 truncate mt-1.5">The package arrived damaged</p><span class="text-[9px] muted">WhatsApp</span></div><div class="text-[9px] muted">08:53</div></div>
+        </aside>
+
+        <div class="chat">
+          <div class="chat-head"><div class="flex items-center gap-3"><div class="avatar w-10 h-10 bg-[#dff3e5] text-[#16703a] text-xs">LB</div><div><div class="text-sm font-semibold">Lucia Bennett</div><div class="flex items-center gap-1.5 text-[10px] muted mt-1"><span class="w-1.5 h-1.5 rounded-full bg-green-500"></span>Online · WhatsApp Business</div></div></div><div class="flex items-center gap-2"><span class="badge green"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>AI active</span><button class="btn btn-soft !px-2.5" aria-label="More options"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg></button></div></div>
+          <div class="chat-body">
+            <div class="day">Today, October 22</div>
+            <div class="message">Hi! I saw the Studio Carry in forest green. Is it large enough for a 15-inch laptop?<div class="msg-meta">10:34</div></div>
+            <div class="message out">Hi Lucia! Yes — the Studio Carry fits laptops up to 15.6 inches, including a charger and a slim notebook. The padded sleeve is 39 × 27 cm.<div class="msg-meta">Replyo AI · 10:34 ✓✓</div></div>
+            <div class="message">Great. Do you still have the green one, and could it arrive in Bristol by Friday?<div class="msg-meta">10:36</div></div>
+            <div class="message out">Forest green is in stock. Standard delivery is 3–4 business days, but express delivery can arrive Friday if ordered before 2 PM. Express is £8.<div class="msg-meta">Replyo AI · 10:36 ✓✓</div></div>
+            <div class="message">Perfect, can I get it by Friday? I also have a code from your October event but it says invalid.<div class="msg-meta">10:38</div></div>
+            <div class="system-note"><strong>AI handed this conversation to Maya</strong><br>Discount exception requested. A human approval is required before the checkout link can be issued.</div>
+            <div class="message out">I can help with that. The code appears to be from our October pop-up, so I’m checking the exception now. I’ll confirm it here in a moment.<div class="msg-meta">Maya · 10:42 ✓✓</div></div>
+            <div class="mt-5 px-4 py-3 rounded-xl bg-[#fff8e7] border border-[#efdda9] text-[11px] text-[#6f591b]"><div class="font-semibold flex items-center gap-2"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0-6 6c0 4-2 5-2 7h16c0-2-2-3-2-7a6 6 0 0 0-6-6Z"/><path d="M10 20h4"/></svg>Internal note · visible to team</div><p class="mt-1.5">October pop-up code OCTSTUDIO can be approved for 10% off. Margin remains above threshold.</p></div>
+          </div>
+          <div class="composer"><div class="replybox">Reply to Lucia…</div><div class="composer-row"><div class="flex gap-3 text-slate-500"><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="m21.4 11.6-8.9 8.9a6 6 0 0 1-8.5-8.5l9.6-9.6a4 4 0 1 1 5.7 5.7l-9.6 9.6a2 2 0 0 1-2.8-2.8l8.9-8.9"/></svg><svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M8 2h8l4 4v14H4V2h4Z"/><path d="M8 2v6h8V2M8 14h8"/></svg></div><div class="flex gap-2"><button class="btn btn-soft">Internal note</button><button class="btn btn-green">Send reply</button></div></div></div>
+        </div>
+
+        <aside class="customer">
+          <div class="section-head"><div class="text-sm font-bold">Customer</div><button aria-label="Close customer panel"><svg class="icon" fill="none" stroke="#4d5851" viewBox="0 0 24 24"><path d="m18 6-12 12M6 6l12 12"/></svg></button></div>
+          <div class="customer-inner">
+            <div class="flex items-center gap-3 pb-5 border-b hairline"><div class="avatar w-12 h-12 bg-[#dff3e5] text-[#16703a] text-sm">LB</div><div><div class="text-sm font-semibold">Lucia Bennett</div><div class="text-[10px] muted mt-1">Customer since May 2026</div></div></div>
+            <h3 class="text-[11px] font-semibold mt-5 mb-1">Customer details</h3>
+            <div class="data-row"><span class="muted">Location</span><span class="font-medium">Bristol, UK</span></div><div class="data-row"><span class="muted">Language</span><span class="font-medium">English</span></div><div class="data-row"><span class="muted">Lifetime value</span><span class="font-medium">£486.00</span></div><div class="data-row"><span class="muted">Conversations</span><span class="font-medium">7</span></div>
+            <h3 class="text-[11px] font-semibold mt-6">Detected intent</h3><div class="mt-2 p-3 rounded-xl bg-[#edf8f0] border border-[#d6ecd9]"><span class="badge green">Purchase intent · 92%</span><p class="text-[11px] leading-relaxed mt-2 text-[#405047]">Wants a Studio Carry in forest green with express delivery and a discount exception.</p></div>
+            <div class="flex items-center justify-between mt-6"><h3 class="text-[11px] font-semibold">Recent orders</h3><span class="text-[10px] text-green-700 font-medium">View all</span></div>
+            <div class="order"><div class="flex justify-between text-[11px] font-semibold"><span>#RY-2841</span><span>£118.00</span></div><div class="text-[10px] muted mt-1.5">Oct 4, 2026 · Delivered</div><div class="mt-3 flex gap-2"><div class="w-9 h-9 rounded-lg bg-[#dce7df] grid place-items-center"><svg class="w-4 h-4" fill="none" stroke="#64756a" stroke-width="1.6" viewBox="0 0 24 24"><path d="M6 2h12l2 7-2 13H6L4 9l2-7Z"/><path d="M9 6a3 3 0 0 0 6 0"/></svg></div><div><div class="text-[10px] font-medium">Arc Weekender</div><div class="text-[9px] muted mt-1">Clay · 1 item</div></div></div></div>
+            <div class="order"><div class="flex justify-between text-[11px] font-semibold"><span>#RY-1933</span><span>£74.00</span></div><div class="text-[10px] muted mt-1.5">May 18, 2026 · Delivered</div></div>
+            <h3 class="text-[11px] font-semibold mt-6">Tags</h3><div class="flex flex-wrap gap-2 mt-2"><span class="badge gray">Repeat buyer</span><span class="badge violet">High intent</span><span class="badge amber">Discount request</span></div>
+            <button class="btn btn-soft w-full justify-center mt-6">Open full profile</button>
+          </div>
+        </aside>
+      </section>
+
+      <div class="heading-row"><div><h2>Agent workflow</h2><p>Route each message to the right action, answer or teammate.</p></div><div class="flex gap-2"><button class="btn btn-soft">Test workflow</button><button class="btn btn-dark">Publish changes</button></div></div>
+      <section class="panel builder" aria-label="Visual AI agent builder">
+        <div class="builder-bar"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg bg-[#e8f7ec] grid place-items-center"><svg class="icon" fill="none" stroke="#16843f" viewBox="0 0 24 24"><path d="M12 2v6M12 16v6M4.9 4.9l4.2 4.2M14.9 14.9l4.2 4.2M2 12h6M16 12h6M4.9 19.1l4.2-4.2M14.9 9.1l4.2-4.2"/></svg></div><div><div class="text-xs font-semibold">Sales &amp; support agent</div><div class="text-[10px] muted mt-1">Version 12 · Updated October 21, 2026</div></div></div><div class="flex items-center gap-3"><span class="badge green"><span class="w-1.5 h-1.5 rounded-full bg-green-600"></span>Live</span><span class="text-[10px] muted">1,284 runs this week</span></div></div>
+        <div class="flow">
+          <div class="wire w1"></div><div class="wire w2"></div><div class="wire w3"></div><div class="wire w4"></div><div class="wire w5"></div>
+          <div class="node n1"><div class="node-top bg-[#25D366]"></div><div class="node-body"><div class="node-icon bg-[#e8f8ee]"><svg class="icon" fill="none" stroke="#16843f" viewBox="0 0 24 24"><path d="M20 11.5a8.4 8.4 0 0 1-9 8.4 9.5 9.5 0 0 1-3.8-1L3 20l1.1-4a8.5 8.5 0 1 1 15.9-4.5Z"/></svg></div><h3>Trigger: WhatsApp</h3><p>Starts when a new inbound message arrives.</p></div><div class="node-foot"><span>Connected</span><span>1 input</span></div></div>
+          <div class="node n2"><div class="node-top bg-[#121715]"></div><div class="node-body"><div class="node-icon bg-[#eef1ef]"><svg class="icon" fill="none" stroke="#2f3a34" viewBox="0 0 24 24"><path d="M9.5 4.5 12 2l2.5 2.5L12 7 9.5 4.5ZM4.5 9.5 7 12l-2.5 2.5L2 12l2.5-2.5ZM19.5 9.5 22 12l-2.5 2.5L17 12l2.5-2.5ZM9.5 19.5 12 17l2.5 2.5L12 22l-2.5-2.5Z"/><circle cx="12" cy="12" r="3"/></svg></div><h3>Classify intent</h3><p>Detects sales, support or booking requests.</p></div><div class="node-foot"><span>Replyo AI</span><span>3 routes</span></div></div>
+          <div class="node n3"><div class="node-top bg-[#2563eb]"></div><div class="node-body"><div class="node-icon bg-[#eaf1ff]"><svg class="icon" fill="none" stroke="#2563eb" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20V3H6.5A2.5 2.5 0 0 0 4 5.5v14Z"/><path d="M8 7h8M8 11h6"/></svg></div><h3>Answer from knowledge</h3><p>Uses products, policies and live inventory.</p></div><div class="node-foot"><span>Sales + support</span><span>84% match</span></div></div>
+          <div class="node n4"><div class="node-top bg-[#7c3aed]"></div><div class="node-body"><div class="node-icon bg-[#f2edff]"><svg class="icon" fill="none" stroke="#7c3aed" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3"/></svg></div><h3>Book appointment</h3><p>Checks availability and confirms the selected slot.</p></div><div class="node-foot"><span>Booking</span><span>Calendar linked</span></div></div>
+          <div class="node n5"><div class="node-top bg-[#f59e0b]"></div><div class="node-body"><div class="node-icon bg-[#fff6df]"><svg class="icon" fill="none" stroke="#ad7307" viewBox="0 0 24 24"><path d="M20 21a8 8 0 0 0-16 0M12 13a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z"/></svg></div><h3>Hand off to human</h3><p>Assigns complex or sensitive requests to the team.</p></div><div class="node-foot"><span>Fallback</span><span>6 teammates</span></div></div>
+          <div class="node n6"><div class="node-top bg-[#16A34A]"></div><div class="node-body"><div class="node-icon bg-[#e8f7ec]"><svg class="icon" fill="none" stroke="#16843f" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg></div><h3>Resolve conversation</h3><p>Confirms the outcome and saves the summary.</p></div><div class="node-foot"><span>Final action</span><span>Track CSAT</span></div></div>
+        </div>
+      </section>
+
+      <div class="heading-row"><div><h2>Today’s performance</h2><p>Live metrics across your WhatsApp customer experience.</p></div><div class="text-[11px] muted">October 22, 2026 · Updated 10:45</div></div>
+      <section class="kpis">
+        <article class="panel kpi"><div class="kpi-label"><span>Conversations today</span><svg class="icon" fill="none" stroke="#7a857e" viewBox="0 0 24 24"><path d="M21 15a4 4 0 0 1-4 4H8l-5 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v8Z"/></svg></div><div><span class="kpi-value">284</span><span class="trend">+18.4%</span></div></article>
+        <article class="panel kpi"><div class="kpi-label"><span>Resolved by AI</span><svg class="icon" fill="none" stroke="#7a857e" viewBox="0 0 24 24"><path d="M12 2v6M5 12H2M22 12h-3M5 5l3 3M19 5l-3 3M7 14a5 5 0 0 1 10 0c0 2-1 3-2 4H9c-1-1-2-2-2-4ZM9 22h6"/></svg></div><div><span class="kpi-value">78.6%</span><span class="trend">+4.2%</span></div></article>
+        <article class="panel kpi"><div class="kpi-label"><span>Average first response</span><svg class="icon" fill="none" stroke="#7a857e" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div><span class="kpi-value">8.4s</span><span class="trend">1.8s faster</span></div></article>
+        <article class="panel kpi"><div class="kpi-label"><span>Customer satisfaction</span><svg class="icon" fill="none" stroke="#7a857e" viewBox="0 0 24 24"><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2-5.6-3-5.6 3 1.1-6.2L3 9.6l6.2-.9L12 3Z"/></svg></div><div><span class="kpi-value">4.8</span><span class="text-sm muted">/ 5</span><span class="trend">+0.2</span></div></article>
+      </section>
+
+      <div class="heading-row"><div><h2>Conversation analytics</h2><p>See when demand peaks and what customers need most.</p></div><button class="btn btn-soft">Export report</button></div>
+      <section class="analytics">
+        <article class="panel chart-card"><div class="flex justify-between items-start mb-5"><div><div class="text-sm font-semibold">Conversations by hour</div><div class="text-[10px] muted mt-1.5">AI-assisted and human-handled sessions</div></div><div class="legend"><span><i style="background:#16A34A"></i>AI handled</span><span><i style="background:#cfd7d1"></i>Human handled</span></div></div><div class="h-[350px]"><canvas id="conversationChart"></canvas></div></article>
+        <article class="panel intent-card"><div class="p-5"><div class="text-sm font-semibold">Top intentions</div><div class="text-[10px] muted mt-1.5">284 conversations classified today</div></div>
+          <div class="intent-row"><div><div class="font-medium">Product questions</div><div class="intent-bar"><span style="width:86%"></span></div></div><div class="text-right muted">86</div><div class="text-right font-semibold">30.3%</div></div>
+          <div class="intent-row"><div><div class="font-medium">Order status</div><div class="intent-bar"><span style="width:67%"></span></div></div><div class="text-right muted">67</div><div class="text-right font-semibold">23.6%</div></div>
+          <div class="intent-row"><div><div class="font-medium">Purchase intent</div><div class="intent-bar"><span style="width:54%"></span></div></div><div class="text-right muted">54</div><div class="text-right font-semibold">19.0%</div></div>
+          <div class="intent-row"><div><div class="font-medium">Returns &amp; exchanges</div><div class="intent-bar"><span style="width:39%"></span></div></div><div class="text-right muted">39</div><div class="text-right font-semibold">13.7%</div></div>
+          <div class="intent-row"><div><div class="font-medium">Discount requests</div><div class="intent-bar"><span style="width:22%"></span></div></div><div class="text-right muted">22</div><div class="text-right font-semibold">7.7%</div></div>
+          <div class="intent-row"><div><div class="font-medium">Other</div><div class="intent-bar"><span style="width:16%"></span></div></div><div class="text-right muted">16</div><div class="text-right font-semibold">5.7%</div></div>
+        </article>
+      </section>
+    </div>
+    <footer class="footer"><div class="flex items-center gap-2"><img src="logos/replyo.png" alt="" class="w-7 h-7 rounded-lg"><span class="font-semibold text-ink">replyo</span><span>· AI customer conversations, handled with care.</span></div><div>Workspace status: All systems operational</div></footer>
+  </main>
+  <script>
+    const context = document.getElementById('conversationChart');
+    new Chart(context, {
+      type: 'bar',
+      data: {
+        labels: ['7 AM','8 AM','9 AM','10 AM','11 AM','12 PM','1 PM','2 PM','3 PM','4 PM','5 PM','6 PM'],
+        datasets: [
+          {label:'AI handled',data:[8,14,22,31,28,19,24,27,30,25,18,11],backgroundColor:'#16A34A',borderRadius:4,borderSkipped:false,barPercentage:.72,categoryPercentage:.72},
+          {label:'Human handled',data:[2,4,7,9,8,6,7,10,8,7,5,3],backgroundColor:'#d4dbd6',borderRadius:4,borderSkipped:false,barPercentage:.72,categoryPercentage:.72}
+        ]
+      },
+      options: {
+        animation:false,responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{display:false},tooltip:{enabled:true,backgroundColor:'#101513',padding:10,titleFont:{family:'Inter',size:11},bodyFont:{family:'Inter',size:11},displayColors:true}},
+        scales:{x:{stacked:true,grid:{display:false},border:{display:false},ticks:{color:'#7a847e',font:{family:'Inter',size:10}}},y:{stacked:true,beginAtZero:true,suggestedMax:48,grid:{color:'#edf0ee'},border:{display:false},ticks:{stepSize:10,color:'#7a847e',font:{family:'Inter',size:10}}}}
+      }
+    });
+  </script>
+</body>
+</html>

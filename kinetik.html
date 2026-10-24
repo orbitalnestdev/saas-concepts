@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kinetik — Gym management</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root{color-scheme:dark;--bg:#0b0b0f;--side:#0d0d12;--panel:#111117;--panel2:#15151c;--line:#282832;--line2:#202028;--text:#f5f4f2;--muted:#8c8b97;--orange:#f97316;--orange2:#fb923c;--green:#46c98d;--red:#f06b6b;--blue:#65a7ff}
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,sans-serif;font-variant-numeric:tabular-nums}
+    body{min-width:1180px}
+    button,input{font:inherit}
+    .shell{display:grid;grid-template-columns:238px minmax(0,1fr);width:100%;min-height:2890px;background:radial-gradient(circle at 78% 4%,rgba(249,115,22,.09),transparent 22%),var(--bg)}
+    .sidebar{border-right:1px solid #1d1d25;background:var(--side);padding:27px 17px;display:flex;flex-direction:column}
+    .brand{display:flex;align-items:center;gap:11px;padding:0 10px 31px}
+    .brand img{width:36px;height:36px;border-radius:11px;object-fit:cover}
+    .brand strong{font-size:18px;letter-spacing:-.04em}
+    .nav-title{font-size:10px;color:#61616c;padding:0 12px 10px}
+    .nav{display:grid;gap:4px}
+    .nav a{height:42px;display:flex;align-items:center;gap:12px;padding:0 12px;border-radius:10px;color:#8b8a96;text-decoration:none;font-size:12px;font-weight:500;border:1px solid transparent}
+    .nav a.active{background:#19191f;border-color:#2b2b34;color:#fff}
+    .nav svg{width:18px;height:18px;flex:none}
+    .nav a.active svg{color:var(--orange2)}
+    .side-bottom{margin-top:auto;padding-top:40px}
+    .club-card{border:1px solid #292932;background:#131319;border-radius:14px;padding:14px}
+    .club-row{display:flex;align-items:center;gap:10px}
+    .club-mark{width:34px;height:34px;border-radius:10px;background:rgba(249,115,22,.12);color:var(--orange2);display:grid;place-items:center}
+    .club-mark svg{width:17px}
+    .club-name{font-size:11px;font-weight:600}
+    .micro{font-size:9px;color:#74737f;margin-top:3px}
+    .online{margin-left:auto;width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 0 3px rgba(70,201,141,.1)}
+    .capacity{margin-top:14px;border-top:1px solid #26262f;padding-top:12px}
+    .capacity-line{display:flex;justify-content:space-between;font-size:9px;color:#777682}
+    .capacity-line strong{color:#bebdc5;font-weight:500}
+    .bar{height:6px;border-radius:999px;background:#25252d;overflow:hidden;margin-top:8px}
+    .bar span{display:block;height:100%;border-radius:inherit;background:var(--orange)}
+    .profile{display:flex;align-items:center;gap:10px;margin-top:14px;padding:14px 9px 1px;border-top:1px solid #23232b}
+    .avatar{width:31px;height:31px;border-radius:50%;display:grid;place-items:center;background:#3a2921;color:#ffb17a;font-size:10px;font-weight:700}
+    .content{padding:31px 34px 48px;min-width:0}
+    .topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+    h1{margin:0;font-size:23px;line-height:1.2;letter-spacing:-.04em;font-weight:650}
+    .subtitle{font-size:11px;color:var(--muted);margin-top:7px}
+    .actions{display:flex;gap:9px}
+    .btn{height:39px;border-radius:10px;padding:0 13px;border:1px solid #30303a;background:#15151b;color:#d7d6dc;font-size:11px;font-weight:550;display:flex;align-items:center;gap:8px}
+    .btn svg{width:15px;height:15px}
+    .btn.primary{background:var(--orange);color:#180b03;border-color:#ff8a37;font-weight:700}
+    .card{background:linear-gradient(145deg,rgba(255,255,255,.015),transparent 55%),var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:0 15px 38px rgba(0,0,0,.14)}
+    .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+    .kpi{padding:18px;min-height:122px}
+    .kpi-head{display:flex;justify-content:space-between;align-items:center;color:#92919c;font-size:10px}
+    .kpi-icon{width:28px;height:28px;border-radius:8px;border:1px solid #303039;background:#18181f;display:grid;place-items:center;color:#f5a167}
+    .kpi-icon svg{width:14px;height:14px}
+    .kpi-value{font-size:25px;letter-spacing:-.045em;font-weight:650;margin-top:15px}
+    .delta{font-size:9px;color:var(--green);margin-top:6px}
+    .delta.warn{color:#f6a05f}
+    .section{margin-top:31px}
+    .section-head{display:flex;justify-content:space-between;align-items:end;margin-bottom:13px}
+    .section-title{font-size:14px;font-weight:600;letter-spacing:-.02em}
+    .section-note{font-size:10px;color:#777681;margin-top:5px}
+    .link{font-size:10px;color:#f5a167;text-decoration:none}
+    .week-controls{display:flex;align-items:center;gap:7px}
+    .icon-btn{width:29px;height:29px;border:1px solid #2e2e37;background:#15151b;color:#96959f;border-radius:8px;display:grid;place-items:center}
+    .icon-btn svg{width:13px;height:13px}
+    .week-label{font-size:10px;color:#c1c0c7;padding:0 7px}
+    .schedule{overflow:hidden}
+    .schedule-grid{display:grid;grid-template-columns:60px repeat(7,1fr)}
+    .schedule-grid>*{min-width:0}
+    .corner,.day{height:52px;border-bottom:1px solid #292932;border-right:1px solid #22222a;background:#131319}
+    .day{padding:11px 9px}
+    .day:last-child{border-right:0}
+    .day strong{display:block;font-size:10px;font-weight:600}
+    .day span{font-size:8px;color:#6e6d78;display:block;margin-top:4px}
+    .day.today{background:rgba(249,115,22,.055)}
+    .day.today strong{color:#ff9b55}
+    .time{height:92px;border-right:1px solid #272730;border-bottom:1px solid #22222a;padding-top:12px;text-align:center;color:#666570;font-size:8px}
+    .slot{height:92px;border-right:1px solid #22222a;border-bottom:1px solid #22222a;padding:6px}
+    .slot:nth-child(8n){border-right:0}
+    .class{height:100%;border-radius:9px;padding:9px 9px 7px;border:1px solid #383842;background:#191920;display:flex;flex-direction:column;justify-content:space-between}
+    .class.orange{background:rgba(249,115,22,.095);border-color:rgba(249,115,22,.27)}
+    .class.blue{background:rgba(101,167,255,.08);border-color:rgba(101,167,255,.22)}
+    .class.green{background:rgba(70,201,141,.07);border-color:rgba(70,201,141,.2)}
+    .class-name{font-size:9px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .class-meta{font-size:7.5px;color:#888791;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .class-foot{display:flex;justify-content:space-between;align-items:center;font-size:7.5px;color:#aaa9b2}
+    .fill{color:#f5a167}
+    .chart-grid{display:grid;grid-template-columns:1.58fr .82fr;gap:12px}
+    .chart-card{height:356px;padding:20px}
+    .chart-top{display:flex;justify-content:space-between;align-items:start;margin-bottom:12px}
+    .chart-stat{font-size:21px;font-weight:650;letter-spacing:-.04em;margin-top:5px}
+    .legend{display:flex;align-items:center;gap:7px;color:#817f8b;font-size:9px}
+    .legend i{width:7px;height:7px;border-radius:50%;background:var(--orange)}
+    .chart-wrap{height:264px}
+    .membership-card{height:356px;padding:20px}
+    .membership-layout{display:grid;grid-template-columns:145px 1fr;align-items:center;height:215px}
+    .donut-wrap{height:145px;position:relative}
+    .donut-center{position:absolute;inset:0;display:grid;place-content:center;text-align:center;pointer-events:none}
+    .donut-center strong{font-size:19px;letter-spacing:-.04em}
+    .donut-center span{font-size:8px;color:#6f6e79;margin-top:3px}
+    .member-legend{display:grid;gap:13px;padding-left:17px}
+    .member-row{display:grid;grid-template-columns:7px 1fr auto;gap:8px;align-items:center;font-size:9px;color:#9897a1}
+    .member-row i{width:7px;height:7px;border-radius:50%}
+    .member-row strong{color:#dedde2;font-weight:600}
+    .renewal-box{border-top:1px solid #292932;padding-top:15px;display:flex;justify-content:space-between;font-size:9px;color:#807f8a}
+    .renewal-box strong{color:#d6d5da;font-weight:500}
+    .risk-card{overflow:hidden}
+    .risk-top{padding:18px 19px;border-bottom:1px solid #292932;display:flex;justify-content:space-between;align-items:center}
+    .risk-list{display:grid;grid-template-columns:repeat(4,1fr)}
+    .risk-item{padding:17px;border-right:1px solid #25252d;min-height:178px;display:flex;flex-direction:column}
+    .risk-item:last-child{border-right:0}
+    .person{display:flex;align-items:center;gap:10px}
+    .person-avatar{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;background:#24242c;color:#e2a476;font-size:10px;font-weight:650;border:1px solid #33333d}
+    .person strong{font-size:10px;font-weight:600;display:block}
+    .person span{font-size:8px;color:#777680;display:block;margin-top:4px}
+    .risk-days{font-size:18px;font-weight:650;letter-spacing:-.035em;margin-top:17px}
+    .risk-days small{font-size:8px;color:#777680;font-weight:400;letter-spacing:0}
+    .risk-reason{font-size:8px;color:#8b8a94;margin-top:5px;line-height:1.45}
+    .whatsapp{margin-top:auto;height:31px;border-radius:8px;border:1px solid rgba(70,201,141,.2);background:rgba(70,201,141,.07);color:#7ad9ab;font-size:8px;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px}
+    .whatsapp svg{width:12px;height:12px}
+    .payments{overflow:hidden}
+    table{width:100%;border-collapse:collapse}
+    th{height:42px;text-align:left;padding:0 15px;color:#6f6e79;background:#131319;border-bottom:1px solid #292932;font-size:8px;font-weight:500}
+    td{height:63px;padding:0 15px;border-bottom:1px solid #22222a;color:#aaa9b2;font-size:9px}
+    tbody tr:last-child td{border-bottom:0}
+    .member-cell{display:flex;align-items:center;gap:10px;color:#ecebf0;font-weight:500}
+    .mini-avatar{width:29px;height:29px;border-radius:50%;display:grid;place-items:center;background:#22222a;color:#d39a73;font-size:8px;border:1px solid #303039}
+    .muted{color:#777681}
+    .status{display:inline-flex;align-items:center;gap:6px;border-radius:7px;padding:5px 8px;font-size:8px;font-weight:600}
+    .status:before{content:"";width:5px;height:5px;border-radius:50%;background:currentColor}
+    .status.paid{color:#64d49d;background:rgba(70,201,141,.08);border:1px solid rgba(70,201,141,.14)}
+    .status.pending{color:#f4aa72;background:rgba(249,115,22,.08);border:1px solid rgba(249,115,22,.15)}
+    .status.failed{color:#ed7b7b;background:rgba(240,107,107,.08);border:1px solid rgba(240,107,107,.14)}
+    .bottom-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:12px}
+    .activity,.class-performance{padding:19px;min-height:300px}
+    .activity-row{display:grid;grid-template-columns:35px 1fr auto;gap:11px;align-items:center;padding:13px 0;border-bottom:1px solid #24242c}
+    .activity-row:last-child{border-bottom:0}
+    .activity-icon{width:34px;height:34px;border-radius:9px;background:#1c1c23;border:1px solid #2d2d36;display:grid;place-items:center;color:#f1a16a}
+    .activity-icon svg{width:15px;height:15px}
+    .activity-copy{font-size:9px;color:#d2d1d7;line-height:1.45}
+    .activity-copy span{color:#777681}
+    .activity-time{font-size:8px;color:#62616c}
+    .performance-row{margin-top:17px}
+    .performance-head{display:flex;justify-content:space-between;font-size:9px;color:#a8a7b0}
+    .performance-head span:last-child{color:#777681}
+    .performance-row .bar{height:7px}
+    .footer{display:flex;justify-content:space-between;padding-top:24px;margin-top:25px;border-top:1px solid #1f1f27;color:#5d5c67;font-size:8px}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <aside class="sidebar">
+      <div>
+        <div class="brand"><img src="logos/kinetik.png" alt="Kinetik logo"><strong>Kinetik</strong></div>
+        <div class="nav-title">Club management</div>
+        <nav class="nav" aria-label="Main navigation">
+          <a class="active" href="#"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/></svg>Dashboard</a>
+          <a href="#"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="4"/><path d="M3 21a6 6 0 0 1 12 0m2-13a3 3 0 0 1 0 6m1 2a5 5 0 0 1 3 5"/></svg>Members</a>
+          <a href="#"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M7 4v6m10-6v6M5 11h14v9H5z"/></svg>Classes</a>
+          <a href="#"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M9 12l2 2 4-5"/><circle cx="12" cy="12" r="9"/></svg>Check-ins</a>
+          <a href="#"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18m4 5h3"/></svg>Payments</a>
+          <a href="#"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="8" cy="8" r="3"/><circle cx="17" cy="9" r="2.5"/><path d="M2.5 20a5.5 5.5 0 0 1 11 0m1-4a4 4 0 0 1 7 3"/></svg>Staff</a>
+          <a href="#"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9m5 10V5m5 14v-7m5 7V3"/></svg>Reports</a>
+        </nav>
+      </div>
+      <div class="side-bottom">
+        <div class="club-card">
+          <div class="club-row"><span class="club-mark"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M6 7v10M3 9v6m15-8v10m3-8v6M6 12h12"/></svg></span><div><div class="club-name">Forge Athletic</div><div class="micro">Downtown location</div></div><span class="online"></span></div>
+          <div class="capacity"><div class="capacity-line"><span>Live capacity</span><strong>86 / 140</strong></div><div class="bar"><span style="width:61%"></span></div></div>
+        </div>
+        <div class="profile"><span class="avatar">JL</span><div><div class="club-name">Jordan Lee</div><div class="micro">Club manager</div></div></div>
+      </div>
+    </aside>
+
+    <section class="content">
+      <header class="topbar">
+        <div><h1>Good morning, Jordan</h1><div class="subtitle">Tuesday, October 20 · Forge Athletic is 61% full right now</div></div>
+        <div class="actions"><button class="btn"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M7 4v6m10-6v6M5 11h14v9H5z"/></svg>Oct 20, 2026</button><button class="btn primary"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg>Add member</button></div>
+      </header>
+
+      <div class="kpis">
+        <article class="card kpi"><div class="kpi-head">Active members <span class="kpi-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="4"/><path d="M3 21a6 6 0 0 1 12 0m3-12v6m-3-3h6"/></svg></span></div><div class="kpi-value">1,284</div><div class="delta">↗ 42 new this month</div></article>
+        <article class="card kpi"><div class="kpi-head">Monthly revenue <span class="kpi-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M4 19V9m6 10V5m6 14v-7m4 7H2"/></svg></span></div><div class="kpi-value">$96,840</div><div class="delta">↗ 8.6% from September</div></article>
+        <article class="card kpi"><div class="kpi-head">Check-ins today <span class="kpi-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="m5 12 4 4L19 6"/><circle cx="12" cy="12" r="9"/></svg></span></div><div class="kpi-value">318</div><div class="delta">24 ahead of last Tuesday</div></article>
+        <article class="card kpi"><div class="kpi-head">Churn risk <span class="kpi-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M12 9v4m0 4h.01M10 3 2.6 17a2 2 0 0 0 1.8 3h15.2a2 2 0 0 0 1.8-3L14 3a2.2 2.2 0 0 0-4 0Z"/></svg></span></div><div class="kpi-value">3.8%</div><div class="delta warn">49 members need attention</div></article>
+      </div>
+
+      <section class="section">
+        <div class="section-head"><div><div class="section-title">Weekly class schedule</div><div class="section-note">52 sessions · 81% average occupancy</div></div><div class="week-controls"><button class="icon-btn" aria-label="Previous week"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="m15 18-6-6 6-6"/></svg></button><span class="week-label">Oct 19–25, 2026</span><button class="icon-btn" aria-label="Next week"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="m9 18 6-6-6-6"/></svg></button></div></div>
+        <div class="card schedule">
+          <div class="schedule-grid">
+            <div class="corner"></div><div class="day"><strong>Mon 19</strong><span>8 classes</span></div><div class="day today"><strong>Tue 20</strong><span>9 classes</span></div><div class="day"><strong>Wed 21</strong><span>8 classes</span></div><div class="day"><strong>Thu 22</strong><span>9 classes</span></div><div class="day"><strong>Fri 23</strong><span>8 classes</span></div><div class="day"><strong>Sat 24</strong><span>6 classes</span></div><div class="day"><strong>Sun 25</strong><span>4 classes</span></div>
+            <div class="time">6:00 AM</div><div class="slot"><div class="class orange"><div><div class="class-name">HIIT Circuit</div><div class="class-meta">Maya Brooks</div></div><div class="class-foot"><span>Studio A</span><b class="fill">20/20</b></div></div></div><div class="slot"><div class="class green"><div><div class="class-name">Power Yoga</div><div class="class-meta">Nina Patel</div></div><div class="class-foot"><span>Studio B</span><b>16/20</b></div></div></div><div class="slot"><div class="class orange"><div><div class="class-name">Bootcamp</div><div class="class-meta">Evan Ross</div></div><div class="class-foot"><span>Turf</span><b>18/24</b></div></div></div><div class="slot"><div class="class blue"><div><div class="class-name">Spin 45</div><div class="class-meta">Theo Grant</div></div><div class="class-foot"><span>Cycle</span><b class="fill">22/22</b></div></div></div><div class="slot"><div class="class orange"><div><div class="class-name">Strength Lab</div><div class="class-meta">Maya Brooks</div></div><div class="class-foot"><span>Studio A</span><b>17/20</b></div></div></div><div class="slot"><div class="class green"><div><div class="class-name">Mobility</div><div class="class-meta">Nina Patel</div></div><div class="class-foot"><span>Studio B</span><b>12/18</b></div></div></div><div class="slot"><div class="class"><div><div class="class-name">Open gym</div><div class="class-meta">Sam Ortega</div></div><div class="class-foot"><span>Floor</span><b>8/20</b></div></div></div>
+            <div class="time">12:00 PM</div><div class="slot"><div class="class blue"><div><div class="class-name">Express Spin</div><div class="class-meta">Theo Grant</div></div><div class="class-foot"><span>Cycle</span><b>19/22</b></div></div></div><div class="slot"><div class="class orange"><div><div class="class-name">Core 30</div><div class="class-meta">Evan Ross</div></div><div class="class-foot"><span>Studio A</span><b>18/20</b></div></div></div><div class="slot"><div class="class green"><div><div class="class-name">Pilates</div><div class="class-meta">Nina Patel</div></div><div class="class-foot"><span>Studio B</span><b class="fill">20/20</b></div></div></div><div class="slot"><div class="class orange"><div><div class="class-name">Box Fit</div><div class="class-meta">Maya Brooks</div></div><div class="class-foot"><span>Turf</span><b>16/20</b></div></div></div><div class="slot"><div class="class blue"><div><div class="class-name">Express Spin</div><div class="class-meta">Theo Grant</div></div><div class="class-foot"><span>Cycle</span><b>14/22</b></div></div></div><div class="slot"><div class="class orange"><div><div class="class-name">Kettlebell</div><div class="class-meta">Evan Ross</div></div><div class="class-foot"><span>Studio A</span><b>17/20</b></div></div></div><div class="slot"><div class="class green"><div><div class="class-name">Slow Flow</div><div class="class-meta">Nina Patel</div></div><div class="class-foot"><span>Studio B</span><b>11/18</b></div></div></div>
+            <div class="time">5:30 PM</div><div class="slot"><div class="class green"><div><div class="class-name">Vinyasa</div><div class="class-meta">Nina Patel</div></div><div class="class-foot"><span>Studio B</span><b>18/20</b></div></div></div><div class="slot"><div class="class blue"><div><div class="class-name">Spin 45</div><div class="class-meta">Theo Grant</div></div><div class="class-foot"><span>Cycle</span><b class="fill">22/22</b></div></div></div><div class="slot"><div class="class orange"><div><div class="class-name">Strength Lab</div><div class="class-meta">Maya Brooks</div></div><div class="class-foot"><span>Studio A</span><b>19/20</b></div></div></div><div class="slot"><div class="class green"><div><div class="class-name">Power Yoga</div><div class="class-meta">Nina Patel</div></div><div class="class-foot"><span>Studio B</span><b>17/20</b></div></div></div><div class="slot"><div class="class orange"><div><div class="class-name">Friday Fight</div><div class="class-meta">Evan Ross</div></div><div class="class-foot"><span>Turf</span><b>21/24</b></div></div></div><div class="slot"><div class="class blue"><div><div class="class-name">Endurance Ride</div><div class="class-meta">Theo Grant</div></div><div class="class-foot"><span>Cycle</span><b>18/22</b></div></div></div><div class="slot"><div class="class"><div><div class="class-name">Recovery</div><div class="class-meta">Sam Ortega</div></div><div class="class-foot"><span>Studio A</span><b>9/16</b></div></div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section chart-grid">
+        <article class="card chart-card"><div class="chart-top"><div><div class="section-title">Check-ins by hour</div><div class="chart-stat">318 <span style="font-size:9px;color:#777681;font-weight:400;letter-spacing:0">total today</span></div></div><div class="legend"><i></i>Today · Oct 20</div></div><div class="chart-wrap"><canvas id="checkinsChart" aria-label="Check-ins by hour on October 20, 2026"></canvas></div></article>
+        <article class="card membership-card"><div class="section-title">Membership status</div><div class="section-note">1,284 active billing profiles</div><div class="membership-layout"><div class="donut-wrap"><canvas id="membershipChart" aria-label="Membership status distribution"></canvas><div class="donut-center"><strong>1,284</strong><span>members</span></div></div><div class="member-legend"><div class="member-row"><i style="background:#f97316"></i><span>Active</span><strong>1,167</strong></div><div class="member-row"><i style="background:#f1ad67"></i><span>Expiring</span><strong>76</strong></div><div class="member-row"><i style="background:#ec6969"></i><span>Overdue</span><strong>41</strong></div></div></div><div class="renewal-box"><span>Renewals due before Oct 31</span><strong>$14,760 expected</strong></div></article>
+      </section>
+
+      <section class="section card risk-card">
+        <div class="risk-top"><div><div class="section-title">At risk members</div><div class="section-note">Attendance patterns flagged for personal follow-up</div></div><a class="link" href="#">View all 49 members</a></div>
+        <div class="risk-list">
+          <article class="risk-item"><div class="person"><span class="person-avatar">ML</span><div><strong>Morgan Lane</strong><span>Unlimited · since 2024</span></div></div><div class="risk-days">21 <small>days absent</small></div><div class="risk-reason">Attendance dropped from 4 visits a week to none.</div><button class="whatsapp"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4.1A8 8 0 1 1 20 11.5Z"/><path d="M9 8c.5 2 2 3.5 4 4"/></svg>Send WhatsApp reminder</button></article>
+          <article class="risk-item"><div class="person"><span class="person-avatar">DR</span><div><strong>Diego Ruiz</strong><span>Strength · since 2025</span></div></div><div class="risk-days">17 <small>days absent</small></div><div class="risk-reason">Two missed classes and no future bookings.</div><button class="whatsapp"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4.1A8 8 0 1 1 20 11.5Z"/><path d="M9 8c.5 2 2 3.5 4 4"/></svg>Send WhatsApp reminder</button></article>
+          <article class="risk-item"><div class="person"><span class="person-avatar">AK</span><div><strong>Avery Kim</strong><span>Off-peak · since 2023</span></div></div><div class="risk-days">14 <small>days absent</small></div><div class="risk-reason">Visit frequency is 62% below personal average.</div><button class="whatsapp"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4.1A8 8 0 1 1 20 11.5Z"/><path d="M9 8c.5 2 2 3.5 4 4"/></svg>Send WhatsApp reminder</button></article>
+          <article class="risk-item"><div class="person"><span class="person-avatar">CS</span><div><strong>Camila Silva</strong><span>Unlimited · since 2026</span></div></div><div class="risk-days">12 <small>days absent</small></div><div class="risk-reason">New member has not completed onboarding.</div><button class="whatsapp"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M20 11.5a8 8 0 0 1-11.8 7L4 20l1.5-4.1A8 8 0 1 1 20 11.5Z"/><path d="M9 8c.5 2 2 3.5 4 4"/></svg>Send WhatsApp reminder</button></article>
+        </div>
+      </section>
+
+      <section class="section">
+        <div class="section-head"><div><div class="section-title">Recent payments</div><div class="section-note">Collected across memberships, passes and personal training</div></div><a class="link" href="#">Open payment report</a></div>
+        <div class="card payments"><table><thead><tr><th>MEMBER</th><th>PLAN</th><th>DATE</th><th>METHOD</th><th>AMOUNT</th><th>STATUS</th></tr></thead><tbody>
+          <tr><td><div class="member-cell"><span class="mini-avatar">OL</span>Olivia Lewis</div></td><td>Unlimited monthly</td><td class="muted">Oct 20, 10:42 AM</td><td>Visa · 4821</td><td>$119.00</td><td><span class="status paid">Paid</span></td></tr>
+          <tr><td><div class="member-cell"><span class="mini-avatar">NB</span>Noah Bennett</div></td><td>10-class pack</td><td class="muted">Oct 20, 9:18 AM</td><td>Apple Pay</td><td>$145.00</td><td><span class="status paid">Paid</span></td></tr>
+          <tr><td><div class="member-cell"><span class="mini-avatar">IC</span>Isla Chen</div></td><td>Personal training · 4</td><td class="muted">Oct 20, 8:36 AM</td><td>Mastercard · 8034</td><td>$260.00</td><td><span class="status paid">Paid</span></td></tr>
+          <tr><td><div class="member-cell"><span class="mini-avatar">JM</span>Jonas Meyer</div></td><td>Unlimited monthly</td><td class="muted">Oct 20, 7:51 AM</td><td>Bank debit</td><td>$119.00</td><td><span class="status pending">Pending</span></td></tr>
+          <tr><td><div class="member-cell"><span class="mini-avatar">SR</span>Sofia Reed</div></td><td>Off-peak monthly</td><td class="muted">Oct 19, 6:12 PM</td><td>Visa · 1176</td><td>$79.00</td><td><span class="status paid">Paid</span></td></tr>
+          <tr><td><div class="member-cell"><span class="mini-avatar">EH</span>Elias Hart</div></td><td>Unlimited monthly</td><td class="muted">Oct 19, 4:48 PM</td><td>Mastercard · 2290</td><td>$119.00</td><td><span class="status failed">Failed</span></td></tr>
+          <tr><td><div class="member-cell"><span class="mini-avatar">ZA</span>Zoe Adams</div></td><td>Day pass · 5</td><td class="muted">Oct 19, 2:25 PM</td><td>Apple Pay</td><td>$90.00</td><td><span class="status paid">Paid</span></td></tr>
+          <tr><td><div class="member-cell"><span class="mini-avatar">TG</span>Tomás Green</div></td><td>Strength monthly</td><td class="muted">Oct 19, 11:09 AM</td><td>Bank debit</td><td>$99.00</td><td><span class="status paid">Paid</span></td></tr>
+        </tbody></table></div>
+      </section>
+
+      <section class="section bottom-grid">
+        <article class="card activity"><div class="section-title">Live club activity</div><div class="section-note">Latest events from the front desk and class studios</div>
+          <div class="activity-row"><span class="activity-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="m5 12 4 4L19 6"/></svg></span><div class="activity-copy">Riley Cooper checked in <span>· QR access</span></div><span class="activity-time">2 min ago</span></div>
+          <div class="activity-row"><span class="activity-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M12 5v14M5 12h14"/></svg></span><div class="activity-copy">Amelia Stone joined <span>· Unlimited monthly</span></div><span class="activity-time">8 min ago</span></div>
+          <div class="activity-row"><span class="activity-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M4 7h16M7 4v6m10-6v6M5 11h14v9H5z"/></svg></span><div class="activity-copy">Spin 45 reached capacity <span>· 3 on waitlist</span></div><span class="activity-time">14 min ago</span></div>
+          <div class="activity-row"><span class="activity-icon"><svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path d="M3 12h18M12 3v18"/></svg></span><div class="activity-copy">Front desk created a guest pass <span>· Rowan Price</span></div><span class="activity-time">21 min ago</span></div>
+        </article>
+        <article class="card class-performance"><div class="section-title">Class occupancy</div><div class="section-note">Top formats across October 2026</div>
+          <div class="performance-row"><div class="performance-head"><span>Spin</span><span>94% · 386 bookings</span></div><div class="bar"><span style="width:94%"></span></div></div>
+          <div class="performance-row"><div class="performance-head"><span>HIIT &amp; conditioning</span><span>89% · 421 bookings</span></div><div class="bar"><span style="width:89%"></span></div></div>
+          <div class="performance-row"><div class="performance-head"><span>Yoga</span><span>83% · 318 bookings</span></div><div class="bar"><span style="width:83%"></span></div></div>
+          <div class="performance-row"><div class="performance-head"><span>Strength</span><span>78% · 352 bookings</span></div><div class="bar"><span style="width:78%"></span></div></div>
+          <div class="performance-row"><div class="performance-head"><span>Mobility &amp; recovery</span><span>64% · 164 bookings</span></div><div class="bar"><span style="width:64%"></span></div></div>
+        </article>
+      </section>
+
+      <footer class="footer"><span>Kinetik · Forge Athletic operations</span><span>Data refreshed Oct 20, 2026 at 11:04 AM</span></footer>
+    </section>
+  </main>
+  <script>
+    new Chart(document.getElementById('checkinsChart'),{type:'bar',data:{labels:['5 AM','6 AM','7 AM','8 AM','9 AM','10 AM','11 AM','12 PM','1 PM','2 PM','3 PM','4 PM','5 PM','6 PM','7 PM','8 PM'],datasets:[{data:[8,22,37,41,29,18,15,26,19,12,11,17,31,44,39,20],backgroundColor:['#34261f','#4a2d1f','#7c3e1b','#f97316','#a64b17','#54311f','#3d2a21','#70391e','#4f3021','#36271f','#33261f','#452c20','#84401c','#f97316','#c45a16','#5e3420'],borderRadius:4,borderSkipped:false,barPercentage:.62}]},options:{animation:false,responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{display:false},border:{display:false},ticks:{color:'#686772',font:{size:8},maxRotation:0}},y:{beginAtZero:true,max:50,grid:{color:'rgba(255,255,255,.055)'},border:{display:false},ticks:{stepSize:10,color:'#686772',font:{size:8}}}}}});
+    new Chart(document.getElementById('membershipChart'),{type:'doughnut',data:{labels:['Active','Expiring','Overdue'],datasets:[{data:[1167,76,41],backgroundColor:['#f97316','#f1ad67','#ec6969'],borderColor:'#111117',borderWidth:4,hoverOffset:0}]},options:{animation:false,responsive:true,maintainAspectRatio:false,cutout:'72%',plugins:{legend:{display:false},tooltip:{enabled:false}}}});
+  </script>
+</body>
+</html>

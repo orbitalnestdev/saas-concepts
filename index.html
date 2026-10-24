@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Conceptos de producto · {eli}dev</title>
+  <meta name="description" content="7 paneles de producto SaaS diseñados como concepto por Eliana Azcurra: CRM con WhatsApp e IA, inbox con agentes, analítica, gimnasio, mayorista B2B, nutricionistas y app de turnos.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Lexend:wght@600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    :root { --bg:#F6F6F7; --ink:#0F0F12; --muted:#5D5D6B; --line:#E4E4EA; --card:#FFFFFF; --accent:#7C5CFF; --accent-ink:#5B3FE0; }
+    @media (prefers-color-scheme: dark) { :root { --bg:#0F0F12; --ink:#F3F3F6; --muted:#A3A3B2; --line:#26262E; --card:#17171C; --accent-ink:#A08CFF; } }
+    * { box-sizing:border-box; }
+    body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.55 Inter, system-ui, sans-serif; }
+    header, main, footer { max-width:1200px; margin:0 auto; padding:0 16px; }
+    header { padding-top:56px; padding-bottom:32px; }
+    .brand { font:500 15px "JetBrains Mono", monospace; color:var(--accent-ink); text-decoration:none; }
+    h1 { font:700 clamp(32px,5vw,52px)/1.1 Lexend, sans-serif; letter-spacing:-0.02em; margin:16px 0 12px; }
+    .lead { font-size:18px; color:var(--muted); max-width:720px; margin:0; }
+    .note { display:inline-block; margin-top:20px; padding:8px 14px; border:1px solid var(--line); border-radius:999px; font-size:14px; color:var(--muted); background:var(--card); }
+    .note b { color:var(--ink); }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:24px; padding-bottom:56px; }
+    .card { display:flex; flex-direction:column; background:var(--card); border:1px solid var(--line); border-radius:16px; overflow:hidden; color:inherit; text-decoration:none; transition:border-color .15s, transform .15s; }
+    .card:hover { border-color:var(--accent); transform:translateY(-2px); }
+    .shot { width:100%; height:auto; display:block; border-bottom:1px solid var(--line); }
+    .body { padding:20px; display:flex; flex-direction:column; gap:12px; flex:1; }
+    .head { display:flex; gap:12px; align-items:center; }
+    .logo { border-radius:10px; }
+    h2 { font:600 20px Lexend, sans-serif; margin:0; }
+    .tag { margin:0; font-size:14px; color:var(--muted); }
+    .desc { margin:0; font-size:15px; color:var(--muted); flex:1; }
+    .chips { display:flex; flex-wrap:wrap; gap:6px; }
+    .chips span { font:500 12px "JetBrains Mono", monospace; padding:4px 8px; border-radius:6px; background:color-mix(in srgb, var(--accent) 12%, transparent); color:var(--accent-ink); }
+    .go { font-weight:600; color:var(--accent-ink); }
+    footer { padding-bottom:48px; color:var(--muted); font-size:14px; }
+    footer a { color:var(--accent-ink); }
+    @media (max-width:420px) { .grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="https://github.com/orbitalnestdev">{eli}dev</a>
+    <h1>Conceptos de producto</h1>
+    <p class="lead">Siete paneles SaaS para mostrar cómo encaro un producto: qué va primero, cómo se lee de un vistazo y qué hace la IA en cada caso.</p>
+    <p class="note"><b>Son conceptos:</b> las marcas, las personas y los datos son inventados.</p>
+  </header>
+  <main>
+    <div class="grid">
+      <a class="card" href="leadnest.html">
+        <img class="shot" src="screenshots/leadnest.jpg" alt="Panel de Leadnest" loading="lazy" width="1280" height="960">
+        <div class="body">
+          <div class="head"><img class="logo" src="logos/leadnest.png" alt="" width="40" height="40"><div><h2>Leadnest</h2><p class="tag">CRM de ventas con WhatsApp e IA</p></div></div>
+          <p class="desc">Pipeline kanban con canal y puntaje de IA en cada oportunidad, gráficos de ingresos y conversión, y un resumen de cada conversación con la intención, el presupuesto y el próximo paso.</p>
+          <div class="chips"><span>Next.js</span><span>PostgreSQL</span><span>OpenAI</span></div>
+          <span class="go">Ver panel →</span>
+        </div>
+      </a>
+      <a class="card" href="replyo.html">
+        <img class="shot" src="screenshots/replyo.jpg" alt="Panel de Replyo" loading="lazy" width="1280" height="960">
+        <div class="body">
+          <div class="head"><img class="logo" src="logos/replyo.png" alt="" width="40" height="40"><div><h2>Replyo</h2><p class="tag">Inbox de WhatsApp con agentes de IA</p></div></div>
+          <p class="desc">El agente responde desde una base de conocimiento, agenda turnos y pasa la consulta a una persona con todo el contexto. Bandeja compartida, panel del cliente, constructor visual de agentes al estilo n8n y métricas de respuestas IA vs. humanas.</p>
+          <div class="chips"><span>Next.js</span><span>n8n</span><span>WhatsApp Cloud API</span></div>
+          <span class="go">Ver panel →</span>
+        </div>
+      </a>
+      <a class="card" href="marginly.html">
+        <img class="shot" src="screenshots/marginly.jpg" alt="Panel de Marginly" loading="lazy" width="1280" height="960">
+        <div class="body">
+          <div class="head"><img class="logo" src="logos/marginly.png" alt="" width="40" height="40"><div><h2>Marginly</h2><p class="tag">Analítica de ganancia para tiendas online</p></div></div>
+          <p class="desc">Ganancia neta real después de costo, envío, comisiones y publicidad para Shopify, WooCommerce y Tiendanube: ROAS por día, cascada de ganancia, productos que pierden plata e ideas de la IA con su impacto estimado.</p>
+          <div class="chips"><span>Next.js</span><span>Shopify API</span><span>Meta Ads</span><span>GA4</span></div>
+          <span class="go">Ver panel →</span>
+        </div>
+      </a>
+      <a class="card" href="kinetik.html">
+        <img class="shot" src="screenshots/kinetik.jpg" alt="Panel de Kinetik" loading="lazy" width="1280" height="960">
+        <div class="body">
+          <div class="head"><img class="logo" src="logos/kinetik.png" alt="" width="40" height="40"><div><h2>Kinetik</h2><p class="tag">Sistema de gestión para gimnasios</p></div></div>
+          <p class="desc">Socios y membresías, grilla semanal de clases con cupos, ingresos por hora, pagos y una lista de socios en riesgo que dejaron de ir, con recordatorio por WhatsApp en un clic.</p>
+          <div class="chips"><span>Next.js</span><span>Prisma</span><span>Stripe</span></div>
+          <span class="go">Ver panel →</span>
+        </div>
+      </a>
+      <a class="card" href="bulkly.html">
+        <img class="shot" src="screenshots/bulkly.jpg" alt="Panel de Bulkly" loading="lazy" width="1280" height="960">
+        <div class="body">
+          <div class="head"><img class="logo" src="logos/bulkly.png" alt="" width="40" height="40"><div><h2>Bulkly</h2><p class="tag">Portal de pedidos mayoristas (B2B)</p></div></div>
+          <p class="desc">El cliente hace pedidos rápidos por SKU con su lista de precios, mínimos por bulto y crédito disponible; el equipo maneja listas por segmento, stock por depósito y cada pedido desde la preparación hasta la factura.</p>
+          <div class="chips"><span>Next.js</span><span>Node.js</span><span>PostgreSQL</span></div>
+          <span class="go">Ver panel →</span>
+        </div>
+      </a>
+      <a class="card" href="nutrio.html">
+        <img class="shot" src="screenshots/nutrio.jpg" alt="Panel de Nutrio" loading="lazy" width="1280" height="960">
+        <div class="body">
+          <div class="head"><img class="logo" src="logos/nutrio.png" alt="" width="40" height="40"><div><h2>Nutrio</h2><p class="tag">Panel para nutricionistas con planes de IA</p></div></div>
+          <p class="desc">Fichas de pacientes con evolución de peso y grasa corporal, macros del día, armado del plan semanal con IA y registro de comidas por foto analizado por IA.</p>
+          <div class="chips"><span>Next.js</span><span>Supabase</span><span>OpenAI</span></div>
+          <span class="go">Ver panel →</span>
+        </div>
+      </a>
+      <a class="card" href="turnly.html">
+        <img class="shot" src="screenshots/turnly.jpg" alt="Panel de Turnly" loading="lazy" width="1280" height="960">
+        <div class="body">
+          <div class="head"><img class="logo" src="logos/turnly.png" alt="" width="40" height="40"><div><h2>Turnly</h2><p class="tag">App de turnos para iOS</p></div></div>
+          <p class="desc">Para clínicas y salones: el cliente elige servicio, profesional y horario, paga una seña y recibe recordatorios; el negocio tiene un back office web con la agenda del día, la ocupación y los ingresos.</p>
+          <div class="chips"><span>React Native</span><span>Expo</span><span>Supabase</span></div>
+          <span class="go">Ver panel →</span>
+        </div>
+      </a>
+    </div>
+  </main>
+  <footer>
+    Hecho por Eliana Azcurra, desarrolladora full stack freelance · <a href="https://www.linkedin.com/in/eliazdev">LinkedIn</a> · <a href="https://www.fiverr.com/elyazcurra90">Fiverr</a> · <a href="https://github.com/orbitalnestdev/saas-concepts">Código en GitHub</a>
+  </footer>
+</body>
+</html>
