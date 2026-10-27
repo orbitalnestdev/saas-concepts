@@ -4,8 +4,6 @@
 
 **7 paneles de producto SaaS diseñados como concepto:** CRM con WhatsApp e IA, inbox con agentes, analítica de ganancia, gimnasio, mayorista B2B, nutricionistas y app de turnos.
 
-<sub>Product concepts: 7 SaaS dashboards with invented brands and sample data.</sub>
-
 [![Ver la galería](https://img.shields.io/badge/Ver_la_galer%C3%ADa-en_vivo-7C5CFF?style=for-the-badge)](https://orbitalnestdev.github.io/saas-concepts/)
 ![HTML](https://img.shields.io/badge/HTML-0F0F12?style=for-the-badge&logo=html5&logoColor=E34F26)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-0F0F12?style=for-the-badge&logo=tailwindcss&logoColor=06B6D4)
@@ -40,7 +38,7 @@
 ## Cómo están hechos
 
 - Cada panel es un solo archivo HTML: Tailwind por CDN, Chart.js para los gráficos e íconos SVG en línea. Sin build ni dependencias.
-- Diseñados a 1440 px de ancho, con datos de ejemplo de octubre de 2026.
+- Diseñados a 1440 px de ancho, en español y con datos de ejemplo de octubre de 2026.
 - El stack de cada ficha es el que usaría para construir el producto real.
 - Diseño y especificación propios; el maquetado se hizo con asistencia de IA.
 
@@ -50,4 +48,4 @@ Cloná el repo y abrí `index.html` en el navegador. No hace falta instalar nada
 
 ---
 
-<div align="center"><sub>Hecho por <a href="https://github.com/orbitalnestdev">Eliana Azcurra</a> · desarrolladora full stack freelance · <a href="https://www.linkedin.com/in/eliazdev">LinkedIn</a> · <a href="https://www.fiverr.com/elyazcurra90">Fiverr</a></sub></div>
+<div align="center"><sub>Hecho por <a href="https://github.com/orbitalnestdev">Eliana Azcurra</a> · desarrolladora full stack freelance · <a href="https://www.linkedin.com/in/eliazdev">LinkedIn</a></sub></div>
